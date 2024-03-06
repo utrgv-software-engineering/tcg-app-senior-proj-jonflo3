@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:tcg_app_sp/models/collection.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:tcg_app_sp/screens/log_in_screen.dart';
 import 'package:tcg_app_sp/screens/search_card_screen.dart';
 
 class CollectionScreen extends StatefulWidget {
   final Collection collect;
 
-  CollectionScreen(this.collect);
+  const CollectionScreen(this.collect);
 
   @override
   _CollectionScreenState createState() => _CollectionScreenState();
@@ -59,6 +60,36 @@ class _CollectionScreenState extends State<CollectionScreen> {
               color: Colors.white,
             ),
           ),
+          IconButton(
+            onPressed: () async {
+              showDialog(
+              context: context,
+              builder: (BuildContext context){ 
+                return AlertDialog(
+                title: const Text("Logout"),
+                content: const Text("Are you sure you want to logout?"),
+                actions: <Widget>[
+                  TextButton(onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(
+                        builder: (context) => const LogInScreen(),
+                      ),);
+                    }, 
+                    child: const Text("Yes")),
+                  TextButton(onPressed: () {
+                      Navigator.pop(context);
+                    }, 
+                    child: const Text("No")),
+                ],
+              );
+            },
+          );
+            },
+            icon: const Icon(
+              Icons.logout,
+              size: 35,
+              color: Colors.white,
+            ),
+          ),
         ],
       ),
       body: Center(
@@ -82,11 +113,10 @@ class _CollectionScreenState extends State<CollectionScreen> {
                   ),
                   itemCount: imageUrls.length,
                   itemBuilder: (context, index) {
-                    return Container(
-                      child: Image.network(
+                      Image.network(
                         imageUrls[index],
-                      ),
-                    );
+                      );
+                      return null;
                   },
                 ),
               );

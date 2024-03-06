@@ -6,7 +6,7 @@ import 'package:tcg_app_sp/screens/collection_screen.dart';
 class SearchCardScreen extends StatefulWidget {
   final Collection collect;
 
-  SearchCardScreen(this.collect);
+  const SearchCardScreen(this.collect);
 
   @override
   _SearchCardScreenState createState() => _SearchCardScreenState();
@@ -27,14 +27,14 @@ void showAddToCollectionDialog(BuildContext context, String cardId, String cardN
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text('Add to Collection'),
+        title: const Text('Add to Collection'),
         content: Text('Do you want to add $cardName to your collection?'),
         actions: <Widget>[
           TextButton(
             onPressed: () async {
               Collection updatedCollection = Collection(cardIds: List<String>.from(widget.collect.cardIds));
               updatedCollection.cardIds.add(cardId);
-              print(widget.collect.cardIds);
+              // print(widget.collect.cardIds);
               // Update the collection in Firestore with the new card ID
               await FirebaseFirestore.instance.collection('UserCollection').doc('userId').set(updatedCollection.toJson());
 
@@ -44,13 +44,13 @@ void showAddToCollectionDialog(BuildContext context, String cardId, String cardN
                         builder: (context) => CollectionScreen(updatedCollection),
                       ),);
             },
-            child: Text('Yes'),
+            child: const Text('Yes'),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text('No'),
+            child: const Text('No'),
           ),
         ],
       );
@@ -65,25 +65,24 @@ void showAddToCollectionDialog(BuildContext context, String cardId, String cardN
         .collection('PokeCards')
         .get()
         .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
-        String id = doc.id;
-        String name = doc['name'].toString().toLowerCase();
-        String imageUrl = doc['images']['small'];
-
-        if (name.startsWith(query.toLowerCase())) {
-          results.add({'id': id, 'name': name, 'imageUrl': imageUrl});
+        for (var doc in querySnapshot.docs) {
+          String id = doc.id;
+          String name = doc['name'].toString().toLowerCase();
+          String imageUrl = doc['images']['small'];
+          if (name.startsWith(query.toLowerCase())) {
+            results.add({'id': id, 'name': name, 'imageUrl': imageUrl});
+          }
         }
-      });
 
-      if (mounted) {
-        setState(() {
-          searchResults = results;
-        });
-      }
-    })
-    .catchError((error) {
-      print('Error fetching data: $error');
-    });
+        if (mounted) {
+          setState(() {
+            searchResults = results;
+          });
+        }
+      })
+      .catchError((error) {
+        throw Exception(error);
+      });
   }
 
   @override
@@ -99,7 +98,7 @@ void showAddToCollectionDialog(BuildContext context, String cardId, String cardN
             onChanged: (value) {
               searchCards(value);
             },
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'Search for cards...',
             ),
           ),
@@ -135,7 +134,7 @@ void showAddToCollectionDialog(BuildContext context, String cardId, String cardN
                   ),
                 ),
                 const SizedBox(
-                  width: 120,
+                  width: 85,
                 ),
                 IconButton(
                   onPressed: () {},
@@ -146,7 +145,7 @@ void showAddToCollectionDialog(BuildContext context, String cardId, String cardN
                   ),
                 ),
                 const SizedBox(
-                  width: 120,
+                  width: 85,
                 ),
                 IconButton(
                   onPressed: () {},
