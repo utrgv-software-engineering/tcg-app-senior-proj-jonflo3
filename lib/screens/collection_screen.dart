@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tcg_app_sp/models/collection.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:tcg_app_sp/screens/card_info_screen.dart';
 import 'package:tcg_app_sp/screens/search_card_screen.dart';
 
 class CollectionScreen extends StatefulWidget {
@@ -14,6 +15,8 @@ class CollectionScreen extends StatefulWidget {
 
 class _CollectionScreenState extends State<CollectionScreen> {
   late Future<List<String>> futureImageUrls;
+  
+  Collection? get collect => null;
 
 
   @override
@@ -82,11 +85,22 @@ class _CollectionScreenState extends State<CollectionScreen> {
                   ),
                   itemCount: imageUrls.length,
                   itemBuilder: (context, index) {
-                    return Container(
-                      child: Image.network(
-                        imageUrls[index],
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CardInfoScreen(index, widget.collect),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        child: Image.network(
+                          imageUrls[index],
+                        ),
                       ),
                     );
+                  
                   },
                 ),
               );
