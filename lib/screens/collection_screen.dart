@@ -3,17 +3,18 @@ import 'package:tcg_app_sp/models/collection.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tcg_app_sp/screens/log_in_screen.dart';
 import 'package:tcg_app_sp/screens/search_card_screen.dart';
+import 'package:tcg_app_sp/screens/card_info_screen.dart';
 
 class CollectionScreen extends StatefulWidget {
   final Collection collect;
 
-  const CollectionScreen(this.collect);
+  const CollectionScreen(this.collect, {super.key});
 
   @override
-  _CollectionScreenState createState() => _CollectionScreenState();
+  CollectionScreenState createState() => CollectionScreenState();
 }
 
-class _CollectionScreenState extends State<CollectionScreen> {
+class CollectionScreenState extends State<CollectionScreen> {
   late Future<List<String>> futureImageUrls;
 
 
@@ -113,10 +114,19 @@ class _CollectionScreenState extends State<CollectionScreen> {
                   ),
                   itemCount: imageUrls.length,
                   itemBuilder: (context, index) {
-                      Image.network(
+                      return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CardInfoScreen(index, widget.collect),
+                          ),
+                        );
+                      },
+                      child: Image.network(
                         imageUrls[index],
-                      );
-                      return null;
+                      ),
+                    );
                   },
                 ),
               );
