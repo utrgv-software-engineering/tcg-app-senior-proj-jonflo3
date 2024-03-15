@@ -6,13 +6,13 @@ import 'package:tcg_app_sp/screens/collection_screen.dart';
 class SearchCardScreen extends StatefulWidget {
   final Collection collect;
 
-  const SearchCardScreen(this.collect);
+  const SearchCardScreen(this.collect, {super.key});
 
   @override
-  _SearchCardScreenState createState() => _SearchCardScreenState();
+  SearchCardScreenState createState() => SearchCardScreenState();
 }
 
-class _SearchCardScreenState extends State<SearchCardScreen> {
+class SearchCardScreenState extends State<SearchCardScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<Map<String, String>> searchResults = [];
 
@@ -34,15 +34,18 @@ void showAddToCollectionDialog(BuildContext context, String cardId, String cardN
             onPressed: () async {
               Collection updatedCollection = Collection(cardIds: List<String>.from(widget.collect.cardIds));
               updatedCollection.cardIds.add(cardId);
-              // print(widget.collect.cardIds);
               // Update the collection in Firestore with the new card ID
               await FirebaseFirestore.instance.collection('UserCollection').doc('userId').set(updatedCollection.toJson());
-
+              print(updatedCollection.cardIds);
               // Trigger a refresh of the CollectionScreen
-              Navigator.pop(context); // Close the dialog
-              Navigator.push(context, MaterialPageRoute(
-                        builder: (context) => CollectionScreen(updatedCollection),
-                      ),);
+              Navigator.pop(context, updatedCollection); 
+              if (mounted) {
+                setState(() {
+                  Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => CollectionScreen(updatedCollection),
+                  ));
+                });
+              }
             },
             child: const Text('Yes'),
           ),
