@@ -32,17 +32,14 @@ void showAddToCollectionDialog(BuildContext context, String cardId, String cardN
         actions: <Widget>[
           TextButton(
             onPressed: () async {
-              Collection updatedCollection = Collection(cardIds: List<String>.from(widget.collect.cardIds));
-              updatedCollection.cardIds.add(cardId);
-              // Update the collection in Firestore with the new card ID
-              await FirebaseFirestore.instance.collection('UserCollection').doc('userId').set(updatedCollection.toJson());
-              print(updatedCollection.cardIds);
-              // Trigger a refresh of the CollectionScreen
-              Navigator.pop(context, updatedCollection); 
+              widget.collect.addCardID(cardId);
+              await FirebaseFirestore.instance.collection('UserCollection').doc('userId').set(widget.collect.toJson());
+
+              Navigator.pop(context, widget.collect); 
               if (mounted) {
                 setState(() {
                   Navigator.push(context, MaterialPageRoute(
-                  builder: (context) => CollectionScreen(updatedCollection),
+                  builder: (context) => CollectionScreen(widget.collect),
                   ));
                 });
               }

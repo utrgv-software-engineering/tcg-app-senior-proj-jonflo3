@@ -1,6 +1,14 @@
 class Collection {
   List<String> cardIds;
 
+  void addCardID(String cardID) {
+    cardIds.add(cardID);
+  }
+
+  void removeCardID(int index) {
+    cardIds.removeAt(index);
+  }
+
 
   Collection({required this.cardIds});
 
