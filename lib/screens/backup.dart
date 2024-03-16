@@ -89,7 +89,7 @@ void showRemoveCardDialogue(BuildContext context, String cardName) {
         IconButton(
           icon: const Icon(Icons.delete),
           onPressed: () async {
-              showRemoveCardDialogue(context, currentCard.getCardName());
+              showRemoveCardDialogue(context, 'this card');
           },
         ),
       ],

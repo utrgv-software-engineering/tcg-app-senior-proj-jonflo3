@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tcg_app_sp/screens/log_in_screen.dart';
 import 'package:tcg_app_sp/screens/search_card_screen.dart';
 import 'package:tcg_app_sp/screens/card_info_screen.dart';
+import 'package:tcg_app_sp/models/card.dart';
 
 class CollectionScreen extends StatefulWidget {
   final Collection collect;
@@ -116,6 +117,8 @@ class CollectionScreenState extends State<CollectionScreen> {
                   itemBuilder: (context, index) {
                       return GestureDetector(
                       onTap: () {
+                        CardInfo currentCard = CardInfo();
+                        currentCard.setID(widget.collect.cardIds[index]);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
