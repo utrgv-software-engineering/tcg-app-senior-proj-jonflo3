@@ -141,9 +141,9 @@ class SearchCardScreenState extends State<SearchCardScreen> {
       bottomNavigationBar: BottomAppBar(
         color: Colors.grey.shade800,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5), // Decreased vertical padding
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween, // evenly spaced buttons
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
                 onPressed: () {},
@@ -153,7 +153,7 @@ class SearchCardScreenState extends State<SearchCardScreen> {
                   color: Colors.white,
                 ),
               ),
-              Spacer(), // evenly space the buttons
+              Spacer(),
               IconButton(
                 onPressed: () {},
                 icon: const Icon(
@@ -162,7 +162,7 @@ class SearchCardScreenState extends State<SearchCardScreen> {
                   color: Colors.white,
                 ),
               ),
-              Spacer(), // evenly space the buttons
+              Spacer(),
               IconButton(
                 onPressed: () {},
                 icon: const Icon(
