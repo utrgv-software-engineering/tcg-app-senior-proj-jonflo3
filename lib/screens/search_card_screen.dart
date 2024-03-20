@@ -143,7 +143,7 @@ class SearchCardScreenState extends State<SearchCardScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween, // evenly spaced buttons
             children: [
               IconButton(
                 onPressed: () {},
@@ -153,6 +153,7 @@ class SearchCardScreenState extends State<SearchCardScreen> {
                   color: Colors.white,
                 ),
               ),
+              Spacer(), // evenly space the buttons
               IconButton(
                 onPressed: () {},
                 icon: const Icon(
@@ -161,6 +162,7 @@ class SearchCardScreenState extends State<SearchCardScreen> {
                   color: Colors.white,
                 ),
               ),
+              Spacer(), // evenly space the buttons
               IconButton(
                 onPressed: () {},
                 icon: const Icon(
