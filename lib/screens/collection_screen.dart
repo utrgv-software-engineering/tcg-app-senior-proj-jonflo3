@@ -1,15 +1,20 @@
+// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:tcg_app_sp/models/collection.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tcg_app_sp/screens/log_in_screen.dart';
+// import 'package:tcg_app_sp/screens/log_in_screen.dart';
 import 'package:tcg_app_sp/screens/search_card_screen.dart';
 import 'package:tcg_app_sp/screens/card_info_screen.dart';
 import 'package:tcg_app_sp/models/card.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:tcg_app_sp/auth.dart';
 
 class CollectionScreen extends StatefulWidget {
   final Collection collect;
 
-  const CollectionScreen(this.collect, {super.key});
+  CollectionScreen(this.collect, {super.key});
+
+  final user = FirebaseAuth.instance.currentUser!;
 
   @override
   CollectionScreenState createState() => CollectionScreenState();
@@ -18,6 +23,9 @@ class CollectionScreen extends StatefulWidget {
 class CollectionScreenState extends State<CollectionScreen> {
   late Future<List<String>> futureImageUrls;
 
+  Future<void> signOut() async{
+    await FirebaseAuth.instance.signOut();
+  }
 
   @override
   void initState() {
@@ -71,10 +79,11 @@ class CollectionScreenState extends State<CollectionScreen> {
                 title: const Text("Logout"),
                 content: const Text("Are you sure you want to logout?"),
                 actions: <Widget>[
-                  TextButton(onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(
-                        builder: (context) => const LogInScreen(),
-                      ),);
+                  TextButton(onPressed: () async {
+                      signOut();
+                      // Navigator.push(context, MaterialPageRoute(
+                      //   builder: (context) => const LogInScreen(),
+                      // ),);
                     }, 
                     child: const Text("Yes")),
                   TextButton(onPressed: () {

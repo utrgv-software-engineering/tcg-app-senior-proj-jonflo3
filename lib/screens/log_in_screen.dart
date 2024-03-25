@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:tcg_app_sp/models/userinfo.dart';
 import 'package:tcg_app_sp/screens/collection_screen.dart';
 import 'package:tcg_app_sp/models/collection.dart';
 import 'package:tcg_app_sp/screens/reset_password_screen.dart';
-import 'package:tcg_app_sp/screens/sign_up_screen.dart';
+// import 'package:tcg_app_sp/screens/sign_up_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LogInScreen extends StatefulWidget {
-  const LogInScreen({super.key});
+  final Function()? onTap;
+  const LogInScreen({super.key, required this.onTap});
 
   @override
   _LogInScreen createState() => _LogInScreen();
@@ -14,14 +15,37 @@ class LogInScreen extends StatefulWidget {
 }
 
 class _LogInScreen extends State<LogInScreen>{
-  TextEditingController usernameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  List<User> users = [
-    User('admin', 'admin@gmail.com', 'admin'),
-    User('user1', 'user1@example.com', 'password1'),
-    User('user2', 'user2@example.com', 'password2'),
-    User('user3', 'user3@example.com', 'password3'),
-  ];
+
+    Future<void> signInWithEmailAndPassword() async {
+    try{
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text, 
+        password: passwordController.text
+        );
+    } on FirebaseAuthException catch (e) {
+      if(e.code.isNotEmpty){
+      setState(() {
+        showDialog(
+          context: context,
+          builder: (BuildContext context){ 
+            return AlertDialog(
+            title: const Text("Error"),
+            content: const Text("Incorrect username or password"),
+            actions: <Widget>[
+              TextButton(onPressed: () {
+                  Navigator.pop(context);
+                }, 
+                child: const Text("OK")),
+              ],
+            );
+          },
+        );
+      });
+      }
+    }
+  }
   @override
 
   Widget build(BuildContext context) {
@@ -46,9 +70,9 @@ class _LogInScreen extends State<LogInScreen>{
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 350),
                   child: TextField(
-                    controller: usernameController,
+                    controller: emailController,
                     decoration: InputDecoration(
-                      labelText: 'Username',
+                      labelText: 'Email',
                       floatingLabelBehavior: FloatingLabelBehavior.never,
                       fillColor: Colors.white,
                       filled: true,
@@ -89,15 +113,6 @@ class _LogInScreen extends State<LogInScreen>{
                   ),
                 ),
                 const SizedBox(height: 10),
-                // ignore: sized_box_for_whitespace
-                // Text(
-                //   match ? "" : "Invalid username or password",
-                //   style: const TextStyle(
-                //     fontSize: 15,
-                //     color: Colors.red,
-                //   ),
-                // ),
-                // const SizedBox(height: 10),
                 SizedBox(
                   width: 240.0,
                   height: 50.0,
@@ -114,7 +129,7 @@ class _LogInScreen extends State<LogInScreen>{
                     )),
                     onPressed: () {
                       setState(() {
-                        if(usernameController.text == '' || passwordController.text == ''){
+                        if(emailController.text == '' || passwordController.text == ''){
                           showDialog(
                               context: context,
                               builder: (BuildContext context){ 
@@ -125,40 +140,42 @@ class _LogInScreen extends State<LogInScreen>{
                                   TextButton(onPressed: () {
                                       Navigator.pop(context);
                                     }, 
-                                    child: const Text("Ok")),
+                                    child: const Text("OK")),
                                   ],
                                 );
                               },
                             );
                             return;
                         }
-                        for(User user in users){
-                          if(user.username == usernameController.text && user.password == passwordController.text){
-                            Collection collect = Collection(cardIds: []);
-                            Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => CollectionScreen(collect),
-                            ),);
-                            break;
-                          }
-                          else{
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context){ 
-                                return AlertDialog(
-                                title: const Text("Error"),
-                                content: const Text("Invalid username or password"),
-                                actions: <Widget>[
-                                  TextButton(onPressed: () {
-                                      Navigator.pop(context);
-                                    }, 
-                                    child: const Text("Ok")),
-                                  ],
-                                );
-                              },
-                            );
-                            return;
-                          }
+                        // for(User user in users){
+                          // if(user.username == emailController.text && user.password == passwordController.text){
+                        else{
+                        Collection collect = Collection(cardIds: []);
+                        Navigator.push(context, MaterialPageRoute(
+                          builder: (context) => CollectionScreen(collect),
+                        ),);
                         }
+                            // break;
+                          // }
+                          // else{
+                            // showDialog(
+                            //   context: context,
+                            //   builder: (BuildContext context){ 
+                            //     return AlertDialog(
+                            //     title: const Text("Error"),
+                            //     content: const Text("Invalid username or password"),
+                            //     actions: <Widget>[
+                            //       TextButton(onPressed: () {
+                            //           Navigator.pop(context);
+                            //         }, 
+                            //         child: const Text("Ok")),
+                            //       ],
+                            //     );
+                            //   },
+                            // );
+                            // return;
+                          // }
+                        // }
                       });
                     },
                 )),
@@ -190,11 +207,10 @@ class _LogInScreen extends State<LogInScreen>{
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     GestureDetector(
-                          onTap: () {
-                            Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => const SignUpScreen(),
-                            ),);
-                          },
+                          onTap: widget.onTap,
+                            // Navigator.push(context, MaterialPageRoute(
+                            //   builder: (context) => const SignUpScreen(),
+                            // ),);
                           child: const Text("Create account",
                             style: TextStyle(
                               color: Color(0xFFFFFFFF),

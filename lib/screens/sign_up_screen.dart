@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:tcg_app_sp/models/userinfo.dart';
-import 'package:tcg_app_sp/screens/log_in_screen.dart';
-import 'package:tcg_app_sp/screens/collection_screen.dart';
-import 'package:tcg_app_sp/models/collection.dart';
+// import 'package:tcg_app_sp/models/userinfo.dart';
+// import 'package:tcg_app_sp/screens/log_in_screen.dart';
+// import 'package:tcg_app_sp/screens/collection_screen.dart';
+// import 'package:tcg_app_sp/models/collection.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+  final Function()? onTap;
+  const SignUpScreen({super.key, required this.onTap});
 
   @override
   _SignUpScreen createState() => _SignUpScreen();
@@ -14,15 +16,52 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreen extends State<SignUpScreen> {
   TextEditingController emailController = TextEditingController();
-  TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
-  List<User> users = [
-    User('admin', 'admin@gmail.com', 'admin'),
-    User('user1', 'user1@example.com', 'password1'),
-    User('user2', 'user2@example.com', 'password2'),
-    User('user3', 'user3@example.com', 'password3'),
-  ];
+  void signUserUp() async {
+    try{
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text, 
+        password: passwordController.text
+        );
+      setState(() {
+        showDialog(
+            context: context,
+            builder: (BuildContext context){ 
+              return AlertDialog(
+              title: const Text("Error"),
+              content: const Text("Password reset email link has been sent."),
+              actions: <Widget>[
+                TextButton(onPressed: () {
+                    Navigator.pop(context);
+                  }, 
+                  child: const Text("OK")),
+                ],
+              );
+            },
+          );
+        });
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        showDialog(
+          context: context,
+          builder: (BuildContext context){ 
+            return AlertDialog(
+            title: const Text("Error"),
+            content: Text(e.message.toString()),
+            actions: <Widget>[
+              TextButton(onPressed: () {
+                  Navigator.pop(context);
+                }, 
+                child: const Text("OK")),
+              ],
+            );
+          },
+        );
+      });
+    }
+  }
+
   @override
 
   Widget build(BuildContext context) {
@@ -78,28 +117,28 @@ class _SignUpScreen extends State<SignUpScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 350),
-                  child: TextField(
-                    controller: usernameController,
-                    decoration: InputDecoration(
-                      labelText: 'Username',
-                      floatingLabelBehavior: FloatingLabelBehavior.never,
-                      fillColor: Colors.white,
-                      filled: true,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.circular(20),
-                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
+                // ConstrainedBox(
+                //   constraints: const BoxConstraints(maxWidth: 350),
+                //   child: TextField(
+                //     controller: usernameController,
+                //     decoration: InputDecoration(
+                //       labelText: 'Username',
+                //       floatingLabelBehavior: FloatingLabelBehavior.never,
+                //       fillColor: Colors.white,
+                //       filled: true,
+                //       enabledBorder: OutlineInputBorder(
+                //         borderSide: const BorderSide(color: Colors.white),
+                //         borderRadius: BorderRadius.circular(20),
+                //       ),
+                //       focusedBorder: OutlineInputBorder(
+                //         borderSide: const BorderSide(color: Colors.white),
+                //         borderRadius: BorderRadius.circular(20),
+                //        ),
+                //       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+                //     ),
+                //   ),
+                // ),
+                // const SizedBox(height: 10),
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 350),
                   child: TextField(
@@ -162,7 +201,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                     )),
                     onPressed: () async {
                       setState(() {
-                          if(emailController.text == '' || usernameController.text == '' || passwordController.text == '' || confirmPasswordController.text == ''){
+                          if(emailController.text == '' || passwordController.text == '' || confirmPasswordController.text == ''){
                             showDialog(
                               context: context,
                               builder: (BuildContext context){ 
@@ -173,60 +212,15 @@ class _SignUpScreen extends State<SignUpScreen> {
                                   TextButton(onPressed: () {
                                       Navigator.pop(context);
                                     }, 
-                                    child: const Text("Ok")),
+                                    child: const Text("OK")),
                                   ],
                                 );
                               },
                             );
                             return;
                           }
-                          for(User user in users){
-                            if(user.email != emailController.text && user.username != usernameController.text && passwordController.text == confirmPasswordController.text){
-                              Collection collect = Collection(cardIds: []);
-                              Navigator.push(context, MaterialPageRoute(
-                                builder: (context) => CollectionScreen(collect),
-                              ),);
-                              break;
-                            }
-                            else{
-                              if(user.email == emailController.text){
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context){ 
-                                    return AlertDialog(
-                                    title: const Text("Error"),
-                                    content: const Text("Email is already used"),
-                                    actions: <Widget>[
-                                      TextButton(onPressed: () {
-                                          Navigator.pop(context);
-                                        }, 
-                                        child: const Text("Ok")),
-                                      ],
-                                    );
-                                  },
-                                );
-                                return;
-                              }
-                              else if(user.username == usernameController.text){
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context){ 
-                                    return AlertDialog(
-                                    title: const Text("Error"),
-                                    content: const Text("Username is already taken"),
-                                    actions: <Widget>[
-                                      TextButton(onPressed: () {
-                                          Navigator.pop(context);
-                                        }, 
-                                        child: const Text("Ok")),
-                                      ],
-                                    );
-                                  },
-                                );
-                                return;
-                              }
-                              else{
-                                showDialog(
+                          else if(passwordController.text != confirmPasswordController.text){
+                            showDialog(
                                   context: context,
                                   builder: (BuildContext context){ 
                                     return AlertDialog(
@@ -241,10 +235,61 @@ class _SignUpScreen extends State<SignUpScreen> {
                                     );
                                   },
                                 );
-                                return;
-                              }
-                            }
+                            return;
                           }
+                          else{
+                            signUserUp();
+                          }
+                          // for(User user in users){
+                          //   if(user.email != emailController.text && passwordController.text == confirmPasswordController.text){
+                          //     Collection collect = Collection(cardIds: []);
+                          //     Navigator.push(context, MaterialPageRoute(
+                          //       builder: (context) => CollectionScreen(collect),
+                          //     ),);
+                          //     break;
+                          //   }
+                          //   else{
+                          //     if(user.email == emailController.text){
+                          //       showDialog(
+                          //         context: context,
+                          //         builder: (BuildContext context){ 
+                          //           return AlertDialog(
+                          //           title: const Text("Error"),
+                          //           content: const Text("Email is already used"),
+                          //           actions: <Widget>[
+                          //             TextButton(onPressed: () {
+                          //                 Navigator.pop(context);
+                          //               }, 
+                          //               child: const Text("Ok")),
+                          //             ],
+                          //           );
+                          //         },
+                          //       );
+                          //       return;
+                          //     }
+                              // else if(user.username == usernameController.text){
+                              //   showDialog(
+                              //     context: context,
+                              //     builder: (BuildContext context){ 
+                              //       return AlertDialog(
+                              //       title: const Text("Error"),
+                              //       content: const Text("Username is already taken"),
+                              //       actions: <Widget>[
+                              //         TextButton(onPressed: () {
+                              //             Navigator.pop(context);
+                              //           }, 
+                              //           child: const Text("Ok")),
+                              //         ],
+                              //       );
+                              //     },
+                              //   );
+                              //   return;
+                              // }
+                          //     else{
+                          //       
+                          //     }
+                          //   }
+                          // }
                       });
                     },
                   )
@@ -261,11 +306,10 @@ class _SignUpScreen extends State<SignUpScreen> {
                         fontSize: 15,
                     ),),
                     GestureDetector(
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(
-                          builder: (context) => const LogInScreen(),
-                        ),);
-                      },
+                      onTap: widget.onTap,
+                        // Navigator.push(context, MaterialPageRoute(
+                        //   builder: (context) => const LogInScreen(),
+                        // ),);
                       child: const Text("Log in",
                         style: TextStyle(
                           color: Color(0xFFFFFFFF),
@@ -285,7 +329,6 @@ class _SignUpScreen extends State<SignUpScreen> {
                           onTap: () async {
                             setState(() {
                               emailController.text = '';
-                              usernameController.text = '';
                               passwordController.text = '';
                               confirmPasswordController.text = '';
                             });

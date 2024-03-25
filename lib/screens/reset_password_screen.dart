@@ -1,6 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:tcg_app_sp/screens/log_in_screen.dart';
-import 'package:tcg_app_sp/models/userinfo.dart';
+// import 'package:tcg_app_sp/screens/log_in_screen.dart';
+// import 'package:tcg_app_sp/models/userinfo.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -11,16 +12,31 @@ class ResetPasswordScreen extends StatefulWidget {
 }
 
 class _ResetPasswordScreen extends State<ResetPasswordScreen> {
-    TextEditingController usernameController = TextEditingController();
-    TextEditingController passwordController = TextEditingController();
-    TextEditingController confirmPasswordController = TextEditingController();
-    List<User> users = [
-    User('admin', 'admin@gmail.com', 'admin'),
-    User('user1', 'user1@example.com', 'password1'),
-    User('user2', 'user2@example.com', 'password2'),
-    User('user3', 'user3@example.com', 'password3'),
-  ];
+    TextEditingController emailController = TextEditingController();
+    String error = "";
+    // TextEditingController passwordController = TextEditingController();
+    // TextEditingController confirmPasswordController = TextEditingController();
+  //   List<User> users = [
+  //   User('admin', 'admin@gmail.com', 'admin'),
+  //   User('user1', 'user1@example.com', 'password1'),
+  //   User('user2', 'user2@example.com', 'password2'),
+  //   User('user3', 'user3@example.com', 'password3'),
+  // ];
   @override
+
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
+
+  Future passwordReset() async {
+    try{
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text.trim());
+    } on FirebaseAuthException catch (e){
+        error = e.message.toString();
+    }
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -55,9 +71,9 @@ class _ResetPasswordScreen extends State<ResetPasswordScreen> {
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 350),
                   child: TextField(
-                    controller: usernameController,
+                    controller: emailController,
                     decoration: InputDecoration(
-                      labelText: 'Username',
+                      labelText: 'Email',
                       floatingLabelBehavior: FloatingLabelBehavior.never,
                       fillColor: Colors.white,
                       filled: true,
@@ -75,73 +91,49 @@ class _ResetPasswordScreen extends State<ResetPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 350),
-                  child: TextField(
-                    controller: passwordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: 'New password',
-                      floatingLabelBehavior: FloatingLabelBehavior.never,
-                      fillColor: Colors.white,
-                      filled: true,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 350),
-                  child: TextField(
-                    controller: confirmPasswordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: 'Conform new password',
-                      floatingLabelBehavior: FloatingLabelBehavior.never,
-                      fillColor: Colors.white,
-                      filled: true,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-                    ),
-                  ),
-                ),
-                // const SizedBox(height: 10),
-                // // ignore: sized_box_for_whitespace
-                // Text(
-                //   match ? "" : "Passwords do not match",
-                //   style: const TextStyle(
-                //     fontSize: 15,
-                //     color: Colors.red,
-                //   ),
-                // ),
-                // Text(
-                //   empty ? "Please enter a username and new password" : "",
-                //   style: const TextStyle(
-                //     fontSize: 15,
-                //     color: Colors.red,
+                // ConstrainedBox(
+                //   constraints: const BoxConstraints(maxWidth: 350),
+                //   child: TextField(
+                //     controller: passwordController,
+                //     obscureText: true,
+                //     decoration: InputDecoration(
+                //       labelText: 'New password',
+                //       floatingLabelBehavior: FloatingLabelBehavior.never,
+                //       fillColor: Colors.white,
+                //       filled: true,
+                //       enabledBorder: OutlineInputBorder(
+                //         borderSide: const BorderSide(color: Colors.white),
+                //         borderRadius: BorderRadius.circular(20),
+                //       ),
+                //       focusedBorder: OutlineInputBorder(
+                //         borderSide: const BorderSide(color: Colors.white),
+                //         borderRadius: BorderRadius.circular(20),
+                //       ),
+                //       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+                //     ),
                 //   ),
                 // ),
                 // const SizedBox(height: 10),
-                // Text(
-                //   exists ? "" : "Username does not exist",
-                //   style: const TextStyle(
-                //     fontSize: 15,
-                //     color: Colors.red,
+                // ConstrainedBox(
+                //   constraints: const BoxConstraints(maxWidth: 350),
+                //   child: TextField(
+                //     controller: confirmPasswordController,
+                //     obscureText: true,
+                //     decoration: InputDecoration(
+                //       labelText: 'Conform new password',
+                //       floatingLabelBehavior: FloatingLabelBehavior.never,
+                //       fillColor: Colors.white,
+                //       filled: true,
+                //       enabledBorder: OutlineInputBorder(
+                //         borderSide: const BorderSide(color: Colors.white),
+                //         borderRadius: BorderRadius.circular(20),
+                //       ),
+                //       focusedBorder: OutlineInputBorder(
+                //         borderSide: const BorderSide(color: Colors.white),
+                //         borderRadius: BorderRadius.circular(20),
+                //       ),
+                //       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+                //     ),
                 //   ),
                 // ),
                 const SizedBox(height: 10),
@@ -162,68 +154,68 @@ class _ResetPasswordScreen extends State<ResetPasswordScreen> {
                     )),
                     onPressed: () {
                       setState(() {
-                        if(usernameController.text == '' || passwordController.text == '' || confirmPasswordController.text == ''){
+                        if(emailController.text == ''){
                           showDialog(
                               context: context,
                               builder: (BuildContext context){ 
                                 return AlertDialog(
                                 title: const Text("Error"),
-                                content: const Text("Fields cannot be empty"),
+                                content: const Text("Please enter an email"),
                                 actions: <Widget>[
                                   TextButton(onPressed: () {
                                       Navigator.pop(context);
                                     }, 
-                                    child: const Text("Ok")),
+                                    child: const Text("OK")),
                                   ],
                                 );
                               },
                             );
                           return;
                         }
-                        if(passwordController.text != confirmPasswordController.text){
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context){ 
-                                return AlertDialog(
-                                title: const Text("Error"),
-                                content: const Text("Passwords do not match"),
-                                actions: <Widget>[
-                                  TextButton(onPressed: () {
-                                      Navigator.pop(context);
-                                    }, 
-                                    child: const Text("Ok")),
-                                  ],
-                                );
-                              },
-                            );
-                          return;
-                        }
-                        for(User user in users){
-                          if(user.username == usernameController.text){
-                            Navigator.push(context, MaterialPageRoute(
-                            builder: (context) => const LogInScreen(),
-                            ),);
-                            break;
-                          }
-                          else{
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context){ 
-                                return AlertDialog(
-                                title: const Text("Error"),
-                                content: const Text("Username does not exist"),
-                                actions: <Widget>[
-                                  TextButton(onPressed: () {
-                                      Navigator.pop(context);
-                                    }, 
-                                    child: const Text("Ok")),
-                                  ],
-                                );
-                              },
-                            );
-                            return;
-                          }
-                        }
+                        // if(passwordController.text != confirmPasswordController.text){
+                        //   showDialog(
+                        //       context: context,
+                        //       builder: (BuildContext context){ 
+                        //         return AlertDialog(
+                        //         title: const Text("Error"),
+                        //         content: const Text("Passwords do not match"),
+                        //         actions: <Widget>[
+                        //           TextButton(onPressed: () {
+                        //               Navigator.pop(context);
+                        //             }, 
+                        //             child: const Text("Ok")),
+                        //           ],
+                        //         );
+                        //       },
+                        //     );
+                        //   return;
+                        // }
+                        // for(User user in users){
+                        //   if(user.username == usernameController.text){
+                        //     Navigator.push(context, MaterialPageRoute(
+                        //     builder: (context) => const LogInScreen(),
+                        //     ),);
+                        //     break;
+                        //   }
+                        //   else{
+                        //     showDialog(
+                        //       context: context,
+                        //       builder: (BuildContext context){ 
+                        //         return AlertDialog(
+                        //         title: const Text("Error"),
+                        //         content: const Text("Username does not exist"),
+                        //         actions: <Widget>[
+                        //           TextButton(onPressed: () {
+                        //               Navigator.pop(context);
+                        //             }, 
+                        //             child: const Text("Ok")),
+                        //           ],
+                        //         );
+                        //       },
+                        //     );
+                        //     return;
+                        //   }
+                        // }
                       });
                     },
                 )),
