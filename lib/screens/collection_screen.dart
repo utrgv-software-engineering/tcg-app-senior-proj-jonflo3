@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tcg_app_sp/models/collection.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:tcg_app_sp/models/collection.dart';
 import 'package:tcg_app_sp/screens/log_in_screen.dart';
 import 'package:tcg_app_sp/screens/search_card_screen.dart';
 import 'package:tcg_app_sp/screens/card_info_screen.dart';
@@ -9,7 +9,7 @@ import 'package:tcg_app_sp/models/card.dart';
 class CollectionScreen extends StatefulWidget {
   final Collection collect;
 
-  const CollectionScreen(this.collect, {super.key});
+  const CollectionScreen(this.collect, {Key? key}) : super(key: key);
 
   @override
   CollectionScreenState createState() => CollectionScreenState();
@@ -17,7 +17,6 @@ class CollectionScreen extends StatefulWidget {
 
 class CollectionScreenState extends State<CollectionScreen> {
   late Future<List<String>> futureImageUrls;
-
 
   @override
   void initState() {
@@ -42,7 +41,8 @@ class CollectionScreenState extends State<CollectionScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF404040),
-        title: const Text('Collection',
+        title: const Text(
+          'Collection',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold, // Customize text color
@@ -52,9 +52,12 @@ class CollectionScreenState extends State<CollectionScreen> {
         actions: [
           IconButton(
             onPressed: () async {
-              Navigator.push(context, MaterialPageRoute(
-                        builder: (context) => SearchCardScreen(widget.collect),
-                      ),);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SearchCardScreen(widget.collect),
+                ),
+              );
             },
             icon: const Icon(
               Icons.add,
@@ -65,26 +68,33 @@ class CollectionScreenState extends State<CollectionScreen> {
           IconButton(
             onPressed: () async {
               showDialog(
-              context: context,
-              builder: (BuildContext context){ 
-                return AlertDialog(
-                title: const Text("Logout"),
-                content: const Text("Are you sure you want to logout?"),
-                actions: <Widget>[
-                  TextButton(onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(
-                        builder: (context) => const LogInScreen(),
-                      ),);
-                    }, 
-                    child: const Text("Yes")),
-                  TextButton(onPressed: () {
-                      Navigator.pop(context);
-                    }, 
-                    child: const Text("No")),
-                ],
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text("Logout"),
+                    content: const Text("Are you sure you want to logout?"),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const LogInScreen(),
+                            ),
+                          );
+                        },
+                        child: const Text("Yes"),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text("No"),
+                      ),
+                    ],
+                  );
+                },
               );
-            },
-          );
             },
             icon: const Icon(
               Icons.logout,
@@ -115,7 +125,7 @@ class CollectionScreenState extends State<CollectionScreen> {
                   ),
                   itemCount: imageUrls.length,
                   itemBuilder: (context, index) {
-                      return GestureDetector(
+                    return GestureDetector(
                       onTap: () {
                         CardInfo currentCard = CardInfo();
                         currentCard.setID(widget.collect.cardIds[index]);
@@ -139,7 +149,45 @@ class CollectionScreenState extends State<CollectionScreen> {
           },
         ),
       ),
-      // BottomAppBar and other widgets
+      bottomNavigationBar: BottomAppBar(
+        color: const Color(0xFF404040),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5), // Adjusted vertical padding
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.autorenew,
+                    size: 35,
+                    color: Colors.white,
+                  ),
+                ),
+                Spacer(),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.folder_open,
+                    size: 35,
+                    color: Colors.white,
+                  ),
+                ),
+                Spacer(),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.account_circle,
+                    size: 35,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
