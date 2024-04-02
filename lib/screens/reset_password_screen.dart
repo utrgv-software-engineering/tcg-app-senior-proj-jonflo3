@@ -37,6 +37,7 @@ class _ResetPasswordScreen extends State<ResetPasswordScreen> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

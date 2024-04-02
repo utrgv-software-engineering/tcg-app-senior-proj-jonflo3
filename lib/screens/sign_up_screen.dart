@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 // import 'package:tcg_app_sp/models/userinfo.dart';
-// import 'package:tcg_app_sp/screens/log_in_screen.dart';
+import 'package:tcg_app_sp/screens/log_in_screen.dart';
 // import 'package:tcg_app_sp/screens/collection_screen.dart';
 // import 'package:tcg_app_sp/models/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,6 +19,12 @@ class _SignUpScreen extends State<SignUpScreen> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
   void signUserUp() async {
+    // showDialog(context: context, 
+    //   builder: (context) {
+    //     return const Center(
+    //       child: CircularProgressIndicator(),
+    //     );
+    //   });
     try{
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text, 
@@ -42,6 +48,7 @@ class _SignUpScreen extends State<SignUpScreen> {
           );
         });
     } on FirebaseAuthException catch (e) {
+      // Navigator.pop(context);
       setState(() {
         showDialog(
           context: context,
@@ -60,24 +67,26 @@ class _SignUpScreen extends State<SignUpScreen> {
         );
       });
     }
+    // Navigator.pop(context);
   }
 
   @override
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF404040),
-        elevation: 0, // Remove elevation
-        leading: IconButton(
-          iconSize: 30,
-          icon: const Icon(Icons.arrow_back),
-          color: const Color(0xffd3d3d3),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: const Color(0xFF404040),
+      //   elevation: 0, // Remove elevation
+      //   leading: IconButton(
+      //     iconSize: 30,
+      //     icon: const Icon(Icons.arrow_back),
+      //     color: const Color(0xffd3d3d3),
+      //     onPressed: () {
+      //       // Navigator.pop(context);
+      //       widget.onTap;
+      //     },
+      //   ),
+      // ),
       body: Container(
         decoration: const BoxDecoration(color: Color(0xFF404040)),
         child: Column(

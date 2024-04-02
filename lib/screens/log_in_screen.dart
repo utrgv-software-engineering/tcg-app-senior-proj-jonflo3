@@ -19,12 +19,19 @@ class _LogInScreen extends State<LogInScreen>{
   TextEditingController passwordController = TextEditingController();
 
     Future<void> signInWithEmailAndPassword() async {
+      showDialog(context: context, 
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      });
     try{
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text, 
         password: passwordController.text
         );
     } on FirebaseAuthException catch (e) {
+      Navigator.pop(context);
       if(e.code.isNotEmpty){
       setState(() {
         showDialog(
@@ -45,6 +52,7 @@ class _LogInScreen extends State<LogInScreen>{
       });
       }
     }
+    Navigator.pop(context);
   }
   @override
 

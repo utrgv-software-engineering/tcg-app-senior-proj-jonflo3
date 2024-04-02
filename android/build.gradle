@@ -2,14 +2,6 @@ plugins {
   id 'com.google.gms.google-services' version '4.4.1' apply false
 }
 
-// buildscript {
-//     ext.kotlin_version = '1.9.23'
-// }
-
-// dependencies { 
-//     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-// }
-
 allprojects {
     repositories {
         google()
