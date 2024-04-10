@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:tcg_app_sp/SQLite/sqlite.dart';
+import 'package:tcg_app_sp/models/userinfo.dart';
 import 'package:tcg_app_sp/screens/collection_screen.dart';
 import 'package:tcg_app_sp/models/collection.dart';
 import 'package:tcg_app_sp/screens/reset_password_screen.dart';
 // import 'package:tcg_app_sp/screens/sign_up_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tcg_app_sp/screens/sign_up_screen.dart';
 
 class LogInScreen extends StatefulWidget {
-  final Function()? onTap;
-  const LogInScreen({super.key, required this.onTap});
+  const LogInScreen({super.key});
 
   @override
   _LogInScreen createState() => _LogInScreen();
@@ -15,45 +16,40 @@ class LogInScreen extends StatefulWidget {
 }
 
 class _LogInScreen extends State<LogInScreen>{
-  TextEditingController emailController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  bool isVisible = false;
+  final formKey = GlobalKey<FormState>();
+  final db = DataBaseHelper();
 
-    Future<void> signInWithEmailAndPassword() async {
-      showDialog(context: context, 
-      builder: (context) {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      });
-    try{
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text, 
-        password: passwordController.text
-        );
-    } on FirebaseAuthException catch (e) {
-      Navigator.pop(context);
-      if(e.code.isNotEmpty){
-      setState(() {
-        showDialog(
-          context: context,
-          builder: (BuildContext context){ 
-            return AlertDialog(
-            title: const Text("Error"),
-            content: const Text("Incorrect username or password"),
-            actions: <Widget>[
-              TextButton(onPressed: () {
-                  Navigator.pop(context);
-                }, 
-                child: const Text("OK")),
-              ],
-            );
-          },
-        );
-      });
-      }
+  Future<void> login() async {
+    var response = await db.login(Users(usrName: usernameController.text, usrPassword: passwordController.text));
+    if(response == true){
+      if(!mounted) return;
+      Collection collect = Collection(cardIds: []);
+      Navigator.pushReplacement(context, MaterialPageRoute(
+        builder: (context) => CollectionScreen(collect),
+      ),);
+    } else {
+      if(!mounted) return;
+      showDialog(
+        context: context,
+        builder: (BuildContext context){ 
+          return AlertDialog(
+          title: const Text("Error"),
+          content: const Text("Incorrect username or password"),
+          actions: <Widget>[
+            TextButton(onPressed: () {
+                Navigator.pop(context);
+              }, 
+              child: const Text("OK")),
+            ],
+          );
+        },
+      );
     }
-    Navigator.pop(context);
   }
+
   @override
 
   Widget build(BuildContext context) {
@@ -61,6 +57,7 @@ class _LogInScreen extends State<LogInScreen>{
       body: Container(
         decoration: const BoxDecoration(color: Color(0xFF404040)),
         child: Column(
+          key: formKey,
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -78,9 +75,10 @@ class _LogInScreen extends State<LogInScreen>{
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 350),
                   child: TextField(
-                    controller: emailController,
+                    controller: usernameController,
                     decoration: InputDecoration(
-                      labelText: 'Email',
+                      prefixIcon: const Icon(Icons.person),
+                      labelText: 'Username',
                       floatingLabelBehavior: FloatingLabelBehavior.never,
                       fillColor: Colors.white,
                       filled: true,
@@ -102,8 +100,16 @@ class _LogInScreen extends State<LogInScreen>{
                   constraints: const BoxConstraints(maxWidth: 350),
                   child: TextField(
                     controller: passwordController,
-                    obscureText: true,
+                    obscureText: !isVisible,
                     decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.lock),
+                      suffixIcon: IconButton(
+                        onPressed: (){
+                          setState(() {
+                            isVisible = !isVisible;
+                          });
+                        },
+                        icon: Icon(isVisible ? Icons.visibility : Icons.visibility_off)),
                       labelText: 'Password',
                       floatingLabelBehavior: FloatingLabelBehavior.never,
                       fillColor: Colors.white,
@@ -137,7 +143,7 @@ class _LogInScreen extends State<LogInScreen>{
                     )),
                     onPressed: () {
                       setState(() {
-                        if(emailController.text == '' || passwordController.text == ''){
+                        if(usernameController.text.isEmpty || passwordController.text.isEmpty){
                           showDialog(
                               context: context,
                               builder: (BuildContext context){ 
@@ -154,36 +160,9 @@ class _LogInScreen extends State<LogInScreen>{
                               },
                             );
                             return;
+                        } else{
+                            login();
                         }
-                        // for(User user in users){
-                          // if(user.username == emailController.text && user.password == passwordController.text){
-                        else{
-                        Collection collect = Collection(cardIds: []);
-                        Navigator.push(context, MaterialPageRoute(
-                          builder: (context) => CollectionScreen(collect),
-                        ),);
-                        }
-                            // break;
-                          // }
-                          // else{
-                            // showDialog(
-                            //   context: context,
-                            //   builder: (BuildContext context){ 
-                            //     return AlertDialog(
-                            //     title: const Text("Error"),
-                            //     content: const Text("Invalid username or password"),
-                            //     actions: <Widget>[
-                            //       TextButton(onPressed: () {
-                            //           Navigator.pop(context);
-                            //         }, 
-                            //         child: const Text("Ok")),
-                            //       ],
-                            //     );
-                            //   },
-                            // );
-                            // return;
-                          // }
-                        // }
                       });
                     },
                 )),
@@ -215,20 +194,19 @@ class _LogInScreen extends State<LogInScreen>{
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     GestureDetector(
-                          onTap: widget.onTap,
-                            // Navigator.push(context, MaterialPageRoute(
-                            //   builder: (context) => const SignUpScreen(),
-                            // ),);
-                          child: const Text("Create account",
-                            style: TextStyle(
-                              color: Color(0xFFFFFFFF),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              decoration: TextDecoration.underline,
-                              decorationColor: Color(0xFFFFFFFF),
-                            ),
-                          ),
+                      onTap: () { 
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const SignUpScreen()));
+                      },
+                      child: const Text("Create account",
+                        style: TextStyle(
+                          color: Color(0xFFFFFFFF),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Color(0xFFFFFFFF),
                         ),
+                      ),
+                    ),
                   ],
                 ),
           ]))

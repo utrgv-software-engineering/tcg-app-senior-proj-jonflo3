@@ -34,7 +34,6 @@ void showAddToCollectionDialog(BuildContext context, String cardId, String cardN
             onPressed: () async {
               widget.collect.addCardID(cardId);
               await FirebaseFirestore.instance.collection('UserCollection').doc('userId').set(widget.collect.toJson());
-
               Navigator.pop(context, widget.collect); 
               if (mounted) {
                 setState(() {
