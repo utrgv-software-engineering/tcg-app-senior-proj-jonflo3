@@ -1,10 +1,14 @@
+// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tcg_app_sp/models/collection.dart';
 import 'package:tcg_app_sp/screens/log_in_screen.dart';
+// import 'package:tcg_app_sp/screens/log_in_screen.dart';
 import 'package:tcg_app_sp/screens/search_card_screen.dart';
 import 'package:tcg_app_sp/screens/card_info_screen.dart';
 import 'package:tcg_app_sp/models/card.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:tcg_app_sp/auth.dart';
 
 class CollectionScreen extends StatefulWidget {
   final Collection collect;
