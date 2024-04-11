@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "C:/Users/mario/CSCI4390/blank-app-jonflo3/windows/flutter"
+  "cmake.sourceDirectory": "C:/Users/mario/CSCI4390/blank-app-jonflo3/windows/flutter",
+  "dart.flutterSdkPath": ".fvm/versions/3.19.5"
 }
