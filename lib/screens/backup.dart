@@ -1,155 +1,251 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tcg_app_sp/models/collection.dart';
-import 'collection_screen.dart';
+import 'package:tcg_app_sp/screens/log_in_screen.dart';
+// import 'package:tcg_app_sp/screens/log_in_screen.dart';
+import 'package:tcg_app_sp/screens/search_card_screen.dart';
+import 'package:tcg_app_sp/screens/card_info_screen.dart';
 import 'package:tcg_app_sp/models/card.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:tcg_app_sp/auth.dart';
 
-class CardInfoScreen extends StatefulWidget {
-  final int index;
+class CollectionScreen extends StatefulWidget {
   final Collection collect;
 
-  const CardInfoScreen(this.index, this.collect, {super.key});
+  const CollectionScreen(this.collect, {Key? key}) : super(key: key);
 
   @override
-  _CardInfoScreenState createState() => _CardInfoScreenState();
+  CollectionScreenState createState() => CollectionScreenState();
 }
 
-class _CardInfoScreenState extends State<CardInfoScreen> {
-  late Future<List<dynamic>> cardInformation;
-  late int length; 
-  late CardInfo currentCard = CardInfo(); 
+class CollectionScreenState extends State<CollectionScreen> {
+  late Future<List<String>> futureImageUrls;
 
   @override
   void initState() {
     super.initState();
-    currentCard.setID(widget.collect.cardIds[widget.index]);
-    cardInformation = fetchCardInfo(widget.collect.cardIds[widget.index]);
-
+    futureImageUrls = fetchImageUrls(widget.collect.cardIds);
   }
 
-  Future<List<dynamic>> fetchCardInfo(String id) async {
-    List<dynamic> cardInfo = [];
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('PokeCards').doc(id).get();
-    if (snapshot.exists) {
-      String name = snapshot['name'];
-      String rarity = snapshot['rarity'];
-      List cardType = snapshot['types'];
-      List stage = snapshot['subtypes'];
-      List attack = snapshot['attacks'];
-      List weakness = snapshot['weaknesses'];
-      List retreatCost = snapshot['retreatCost'];
-      String cardNum = snapshot['number'];
-      String imageUrl = snapshot['images']['small'];
-
-      cardInfo = [name, rarity, cardType, stage, attack, weakness, retreatCost, cardNum, imageUrl];
+  Future<List<String>> fetchImageUrls(List<String> cardIds) async {
+    List<String> imageUrls = [];
+    for (String cardId in cardIds) {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('PokeCards').doc(cardId).get();
+      if (snapshot.exists) {
+        String imageUrl = snapshot['images']['small'];
+        imageUrls.add(imageUrl);
+      }
     }
-    return cardInfo;
+    return imageUrls;
   }
-
-
-
-void showRemoveCardDialogue(BuildContext context, String cardName) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Add to Collection'),
-        content: Text('Do you want to remove $cardName from your collection?'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () async {
-              setState(() {
-                widget.collect.removeCardID(widget.index);
-              });
-              Navigator.pop(context); // Close the dialog
-              Navigator.push(context, MaterialPageRoute(
-                        builder: (context) => CollectionScreen(widget.collect),
-                      ),);
-            },
-            child: const Text('Yes'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('No'),
-          ),
-        ],
-      );
-    },
-  );
-}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Card Information'),
-        actions: [
-        IconButton(
-          icon: const Icon(Icons.delete),
-          onPressed: () async {
-              showRemoveCardDialogue(context, 'this card');
-          },
+        backgroundColor: const Color(0xFF404040),
+        title: const Text(
+          'Collection',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold, // Customize text color
+          ),
         ),
-      ],
-      ),
-      body: FutureBuilder<List<dynamic>>(
-        future: cardInformation, 
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('ERROR: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Container(
-                    alignment: Alignment.topCenter,
-                    child: Image.network(
-                    currentCard.getImageURL(),
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Text(currentCard.getCardName(),
-                        style: const TextStyle(
-                          color: Color.fromARGB(255, 7, 6, 6),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 35,
-                        ),
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            onPressed: () async {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SearchCardScreen(widget.collect),
+                ),
+              );
+            },
+            icon: const Icon(
+              Icons.add,
+              size: 35,
+              color: Colors.white,
+            ),
+          ),
+          IconButton(
+            onPressed: () async {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text("Logout"),
+                    content: const Text("Are you sure you want to logout?"),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const LogInScreen(),
+                            ),
+                          );
+                        },
+                        child: const Text("Yes"),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text("No"),
                       ),
                     ],
-                  ),
-                  Container(
-                    alignment: Alignment.topLeft,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Card Information',
-                          style: TextStyle(
-                          color: Color.fromARGB(255, 7, 6, 6),
-                          fontSize: 25,)
-                        ),
-                        Text("Rarity: ${currentCard.getRarity()}"),
-                        Text('Card Type: ${currentCard.getCardType()}'),
-                        Text('Stage: ${currentCard.getCardStage()}'),
-                        Text(currentCard.getCardMoves()),
-                        Text('Weakness: ${currentCard.getCardWeakness()}'),
-                        Text('Card Number: ${currentCard.getCardNum()}'),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          } else {
-            return const Center(child: Text('No Data'));
-          }
-        },
+                  );
+                },
+              );
+            },
+            icon: const Icon(
+              Icons.logout,
+              size: 35,
+              color: Colors.white,
+            ),
+          ),
+        ],
       ),
+      drawer: const NavigationDrawer(),
+      body: Center(
+        child: FutureBuilder<List<String>>(
+          future: futureImageUrls,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('ERROR: ${snapshot.error}');
+            } else if (snapshot.hasData) {
+              final List<String> imageUrls = snapshot.data!;
+              return Padding(
+                padding: const EdgeInsets.all(10),
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 5,
+                    childAspectRatio: 735 / 1025,
+                  ),
+                  itemCount: imageUrls.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        CardInfo currentCard = CardInfo();
+                        currentCard.setID(widget.collect.cardIds[index]);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CardInfoScreen(index, widget.collect),
+                          ),
+                        );
+                      },
+                      child: Image.network(
+                        imageUrls[index],
+                      ),
+                    );
+                  },
+                ),
+              );
+            } else {
+              return const Text('No Data');
+            }
+          },
+        ),
+      ),
+      /*bottomNavigationBar: BottomAppBar(
+        color: const Color(0xFF404040),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5), // Adjusted vertical padding
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.autorenew,
+                    size: 35,
+                    color: Colors.white,
+                  ),
+                ),
+                Spacer(),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.folder_open,
+                    size: 35,
+                    color: Colors.white,
+                  ),
+                ),
+                Spacer(),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.account_circle,
+                    size: 35,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),*/
     );
   }
+}
+
+class NavigationDrawer extends StatelessWidget {
+  const NavigationDrawer({super.key});
+
+  @override 
+  Widget build(BuildContext context) {
+    return Drawer(
+    child: SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          buildHeader(context),
+          buildMenuItems(context),
+        ],
+      ),
+    ),
+  );
+  }
+
+  Widget buildHeader(BuildContext context) => const DrawerHeader(
+    decoration: BoxDecoration(
+      color: Colors.blue,
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          Icons.account_circle,
+          size: 50,
+          color: Colors.white,
+        ),
+        Text(
+          'User Name',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          ),
+        ),
+      ],
+    ),
+  );
+
+  Widget buildMenuItems(BuildContext context) => Column(
+    children: [
+      ListTile(
+        leading: const Icon(Icons.home_outlined),
+        title: const Text('Home'),
+        onTap: () {},
+      )
+    ]
+  );
+
 }

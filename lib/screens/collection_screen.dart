@@ -7,7 +7,8 @@ import 'package:tcg_app_sp/screens/log_in_screen.dart';
 import 'package:tcg_app_sp/screens/search_card_screen.dart';
 import 'package:tcg_app_sp/screens/card_info_screen.dart';
 import 'package:tcg_app_sp/models/card.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tcg_app_sp/models/userinfo.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:tcg_app_sp/auth.dart';
 
 class CollectionScreen extends StatefulWidget {
@@ -44,15 +45,17 @@ class CollectionScreenState extends State<CollectionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF404040),
+        backgroundColor: const Color(0xFF404040), 
+        elevation: 0, 
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           'Collection',
           style: TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.bold, // Customize text color
+            fontWeight: FontWeight.bold,
           ),
         ),
-        automaticallyImplyLeading: false,
+        centerTitle: true, 
         actions: [
           IconButton(
             onPressed: () async {
@@ -69,45 +72,9 @@ class CollectionScreenState extends State<CollectionScreen> {
               color: Colors.white,
             ),
           ),
-          IconButton(
-            onPressed: () async {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text("Logout"),
-                    content: const Text("Are you sure you want to logout?"),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const LogInScreen(),
-                            ),
-                          );
-                        },
-                        child: const Text("Yes"),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text("No"),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-            icon: const Icon(
-              Icons.logout,
-              size: 35,
-              color: Colors.white,
-            ),
-          ),
-        ],
+        ]
       ),
+      drawer: const NavigationDrawer(),
       body: Center(
         child: FutureBuilder<List<String>>(
           future: futureImageUrls,
@@ -153,45 +120,94 @@ class CollectionScreenState extends State<CollectionScreen> {
           },
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: const Color(0xFF404040),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5), // Adjusted vertical padding
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.autorenew,
-                    size: 35,
-                    color: Colors.white,
-                  ),
-                ),
-                Spacer(),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.folder_open,
-                    size: 35,
-                    color: Colors.white,
-                  ),
-                ),
-                Spacer(),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.account_circle,
-                    size: 35,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
+}
+
+class NavigationDrawer extends StatelessWidget {
+  const NavigationDrawer({super.key});
+
+  @override 
+  Widget build(BuildContext context) {
+    return Drawer(
+    child: SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          buildHeader(context),
+          buildMenuItems(context),
+        ],
+      ),
+    ),
+  );
+  }
+
+  Widget buildHeader(BuildContext context) => const DrawerHeader(
+    decoration: BoxDecoration(
+      color: const Color(0xFF404040),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          Icons.account_circle,
+          size: 50,
+          color: Colors.white,
+        ),
+        Text(
+          'User Name',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          ),
+        ),
+      ],
+    ),
+  );
+
+  Widget buildMenuItems(BuildContext context) => Column(
+    children: [
+      ListTile(
+        leading: const Icon(Icons.home_outlined),
+        title: const Text('Home'),
+        onTap: () {},
+      ),
+      const Divider(), 
+      ListTile(
+        leading: const Icon(Icons.exit_to_app), 
+        title: const Text('Sign Out'),
+        onTap: () async {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("Logout"),
+                content: const Text("Are you sure you want to logout?"),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LogInScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text("Yes"),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("No"),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      ),
+    ]
+  );
+
 }

@@ -138,43 +138,6 @@ class SearchCardScreenState extends State<SearchCardScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.grey.shade800,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5), // Decreased vertical padding
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.autorenew,
-                  size: 35,
-                  color: Colors.white,
-                ),
-              ),
-              Spacer(),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.folder_open,
-                  size: 35,
-                  color: Colors.white,
-                ),
-              ),
-              Spacer(),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.account_circle,
-                  size: 35,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

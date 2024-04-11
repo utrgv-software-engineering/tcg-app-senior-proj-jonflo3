@@ -20,4 +20,8 @@ class Users {
         "usrName": usrName,
         "usrPassword": usrPassword,
     };
+
+    String getUserName() {
+      return usrName;
+    }
 }
