@@ -6,7 +6,7 @@ import 'package:tcg_app_sp/screens/collection_screen.dart';
 class SearchCardScreen extends StatefulWidget {
   final Collection collect;
 
-  const SearchCardScreen(this.collect, {Key? key}) : super(key: key);
+  const SearchCardScreen(this.collect, {super.key});
 
   @override
   SearchCardScreenState createState() => SearchCardScreenState();
@@ -35,8 +35,8 @@ class SearchCardScreenState extends State<SearchCardScreen> {
               onPressed: () async {
                 widget.collect.addCardID(cardId);
                 await FirebaseFirestore.instance
-                    .collection('UserCollection')
-                    .doc('userId')
+                    .collection('usersAndTheirCollection')
+                    .doc(widget.collect.username)
                     .set(widget.collect.toJson());
 
                 Navigator.pop(context, widget.collect);
