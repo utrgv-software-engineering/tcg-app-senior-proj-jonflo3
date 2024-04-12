@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Collection {
   List<String> cardIds;
   String username = '';
+  double collectionPrice = 0.0;
 
 
 
@@ -19,30 +22,45 @@ class Collection {
       List<dynamic> idLIST = snapshot['PokeIDs'];
       cardIDsList = List<String>.from(idLIST.map((id) => id.toString()));
       cardIds = cardIDsList; 
-    } else {
-      
-    }
+    } 
   }
 
   String getName() {
     return username;
   }
 
+  Future<void> getCollectionPrice() async {
+    String apiBase = 'https://api.pokemontcg.io/v2/cards';
+    collectionPrice = 0; 
+    for(int i = 0; i < cardIds.length; i++){
+      String curID = cardIds[i];
+      var response = await http.get(Uri.parse('$apiBase?q=id:$curID'));
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = json.decode(response.body);
+
+        double averageSellPrice;
+        if (data['data'][0]['tcgplayer']['prices']['holofoil'] != null) {
+          averageSellPrice = data['data'][0]['tcgplayer']['prices']['holofoil']['market'];
+        } else {
+          averageSellPrice = data['data'][0]['tcgplayer']['prices']['normal']['market'];
+        }
+        collectionPrice = collectionPrice + averageSellPrice; 
+      } 
+    }
+  }
+
+  //SECTION 2
   void addCardID(String cardID) async {
     cardIds.add(cardID);
 
     DocumentReference userDocRef = FirebaseFirestore.instance.collection('usersAndTheirCollection').doc(username);
-    DocumentSnapshot snapshot = await userDocRef.get();
 
-    if (snapshot.exists) {
-      await userDocRef.update({
-        'PokeIDs': FieldValue.arrayUnion([cardID])
-      });
-    } else {
-
-    }
-
+    await userDocRef.update({
+        'PokeIDs': FieldValue.arrayUnion([cardID]),
+    });
   }
+
 
 
   void removeCardID(int index) async {
@@ -56,16 +74,11 @@ class Collection {
       idLIST.removeAt(index);
       await userDocRef.update({'PokeIDs': idLIST});
 
-    } else {
-
-    }
+    } 
   }
 
-
-  //Collection({required this.cardIds});
-
+  //Constructors 
   Collection({required this.cardIds, required this.username}) {
-    // Function called inside the constructor
     assignUserName(username);
     fetchUserData();
   }
@@ -89,7 +102,8 @@ class Collection {
     } else {
       await FirebaseFirestore.instance.collection('usersAndTheirCollection').doc(username).set({
         'username': username,
-        'PokeIDs': [], // Set PokeIDs as an empty array
+        'PokeIDs': [], 
+        'ColPriceTotal': 0,
       });
     }
   }
