@@ -134,7 +134,7 @@ class NavigationDrawer extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           buildHeader(context, collect),
-          buildMenuItems(context),
+          buildMenuItems(context, collect),
         ],
       ),
     ),
@@ -173,7 +173,7 @@ class NavigationDrawer extends StatelessWidget {
     )
   );
 
-  Widget buildMenuItems(BuildContext context) => Column(
+  Widget buildMenuItems(BuildContext context, Collection collect) => Column(
     children: [
       ListTile(
         leading: const Icon(Icons.home_outlined),
@@ -186,7 +186,9 @@ class NavigationDrawer extends StatelessWidget {
       ),
       ListTile(
         title: const Text('Build a Deck'),
-        onTap: () {},
+        onTap: () {
+          collect.getCollectionPrice();
+        },
       ),
       const Divider(), 
       ListTile(
