@@ -6,6 +6,7 @@ import 'package:tcg_app_sp/models/collection.dart';
 import 'package:tcg_app_sp/screens/reset_password_screen.dart';
 // import 'package:tcg_app_sp/screens/sign_up_screen.dart';
 import 'package:tcg_app_sp/screens/sign_up_screen.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({super.key});
@@ -26,7 +27,8 @@ class _LogInScreen extends State<LogInScreen>{
     var response = await db.login(Users(usrName: usernameController.text, usrPassword: passwordController.text));
     if(response == true){
       if(!mounted) return;
-      Collection collect = Collection(cardIds: []);
+      Collection collect = Collection(cardIds: [], username: usernameController.text);
+      await collect.fetchUserData();
       Navigator.pushReplacement(context, MaterialPageRoute(
         builder: (context) => CollectionScreen(collect),
       ),);

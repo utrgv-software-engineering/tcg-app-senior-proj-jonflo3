@@ -1,20 +1,15 @@
-// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tcg_app_sp/models/collection.dart';
 import 'package:tcg_app_sp/screens/log_in_screen.dart';
-// import 'package:tcg_app_sp/screens/log_in_screen.dart';
 import 'package:tcg_app_sp/screens/search_card_screen.dart';
 import 'package:tcg_app_sp/screens/card_info_screen.dart';
 import 'package:tcg_app_sp/models/card.dart';
-import 'package:tcg_app_sp/models/userinfo.dart';
-//import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:tcg_app_sp/auth.dart';
 
 class CollectionScreen extends StatefulWidget {
   final Collection collect;
 
-  const CollectionScreen(this.collect, {Key? key}) : super(key: key);
+  const CollectionScreen(this.collect, {super.key});
 
   @override
   CollectionScreenState createState() => CollectionScreenState();
@@ -74,7 +69,7 @@ class CollectionScreenState extends State<CollectionScreen> {
           ),
         ]
       ),
-      drawer: const NavigationDrawer(),
+      drawer: NavigationDrawer(collect: widget.collect),
       body: Center(
         child: FutureBuilder<List<String>>(
           future: futureImageUrls,
@@ -124,9 +119,13 @@ class CollectionScreenState extends State<CollectionScreen> {
   }
 }
 
-class NavigationDrawer extends StatelessWidget {
-  const NavigationDrawer({super.key});
 
+class NavigationDrawer extends StatelessWidget {
+  final Collection collect;
+
+  const NavigationDrawer({super.key, required this.collect});
+
+  
   @override 
   Widget build(BuildContext context) {
     return Drawer(
@@ -134,7 +133,7 @@ class NavigationDrawer extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          buildHeader(context),
+          buildHeader(context, collect),
           buildMenuItems(context),
         ],
       ),
@@ -142,27 +141,36 @@ class NavigationDrawer extends StatelessWidget {
   );
   }
 
-  Widget buildHeader(BuildContext context) => const DrawerHeader(
-    decoration: BoxDecoration(
-      color: const Color(0xFF404040),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(
-          Icons.account_circle,
-          size: 50,
-          color: Colors.white,
+  Widget buildHeader(BuildContext context, Collection collect) => Material(
+    color: const Color(0xFF404040),
+    child: InkWell(
+      onTap: () {},
+      child: Container(
+        padding: EdgeInsets.only(
+          top: 5 + MediaQuery.of(context).padding.top,
+          bottom: 15,
+          left: 15,
         ),
-        Text(
-          'User Name',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
+        child: Row(
+          children: [
+            const Icon(
+              Icons.account_circle,
+              size: 50,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 5),
+            Text(
+            collect.getName(),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+            )
           ),
-        ),
-      ],
-    ),
+          ]
+        )
+      )
+
+    )
   );
 
   Widget buildMenuItems(BuildContext context) => Column(
@@ -170,6 +178,14 @@ class NavigationDrawer extends StatelessWidget {
       ListTile(
         leading: const Icon(Icons.home_outlined),
         title: const Text('Home'),
+        onTap: () {},
+      ),
+      ListTile(
+        title: const Text('Collection'),
+        onTap: () {},
+      ),
+      ListTile(
+        title: const Text('Build a Deck'),
         onTap: () {},
       ),
       const Divider(), 
