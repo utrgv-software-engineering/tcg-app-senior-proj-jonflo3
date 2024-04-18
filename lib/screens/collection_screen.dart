@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tcg_app_sp/models/collection.dart';
 import 'package:tcg_app_sp/screens/log_in_screen.dart';
+import 'package:tcg_app_sp/screens/profile_screen.dart';
 import 'package:tcg_app_sp/screens/search_card_screen.dart';
 import 'package:tcg_app_sp/screens/card_info_screen.dart';
 import 'package:tcg_app_sp/models/card.dart';
@@ -43,6 +44,17 @@ class CollectionScreenState extends State<CollectionScreen> {
         backgroundColor: const Color(0xFF404040), 
         elevation: 0, 
         iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+          onPressed: () async {
+            Navigator.push(
+              context, 
+              MaterialPageRoute(
+                builder: (context) => const ProfileScreen()
+              )
+            );
+          },
+          icon: const Icon(Icons.person),
+          ),
         title: const Text(
           'Collection',
           style: TextStyle(
@@ -54,12 +66,17 @@ class CollectionScreenState extends State<CollectionScreen> {
         actions: [
           IconButton(
             onPressed: () async {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SearchCardScreen(widget.collect),
-                ),
-              );
+              // Collection collect = Collection(cardIds: [], username: widget.username);
+              // await collect.fetchUserData();
+              Navigator.push(context, MaterialPageRoute(
+                builder: (context) => const ProfileScreen(),
+              ),);
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => SearchCardScreen(widget.collect, widget.username),
+              //   ),
+              // );
             },
             icon: const Icon(
               Icons.add,
@@ -67,9 +84,46 @@ class CollectionScreenState extends State<CollectionScreen> {
               color: Colors.white,
             ),
           ),
-        ]
-      ),
-      drawer: NavigationDrawer(collect: widget.collect),
+          IconButton(
+              onPressed: () async {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text("Logout"),
+                      content: const Text("Are you sure you want to logout?"),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LogInScreen(),
+                              ),
+                            );
+                          },
+                          child: const Text("Yes"),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text("No"),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              icon: const Icon(
+                Icons.logout,
+                size: 35,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      // drawer: NavigationDrawer(collect: widget.collect),
       body: Center(
         child: FutureBuilder<List<String>>(
           future: futureImageUrls,
@@ -93,6 +147,8 @@ class CollectionScreenState extends State<CollectionScreen> {
                   itemBuilder: (context, index) {
                     return GestureDetector(
                       onTap: () {
+                        // Collection collect = Collection(cardIds: [], username: widget.username);
+                        // await collect.fetchUserData();
                         CardInfo currentCard = CardInfo();
                         currentCard.setID(widget.collect.cardIds[index]);
                         Navigator.push(
@@ -120,112 +176,112 @@ class CollectionScreenState extends State<CollectionScreen> {
 }
 
 
-class NavigationDrawer extends StatelessWidget {
-  final Collection collect;
+// class NavigationDrawer extends StatelessWidget {
+//   final Collection collect;
 
-  const NavigationDrawer({super.key, required this.collect});
+//   const NavigationDrawer({super.key, required this.collect});
 
   
-  @override 
-  Widget build(BuildContext context) {
-    return Drawer(
-    child: SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          buildHeader(context, collect),
-          buildMenuItems(context, collect),
-        ],
-      ),
-    ),
-  );
-  }
+//   @override 
+//   Widget build(BuildContext context) {
+//     return Drawer(
+//     child: SingleChildScrollView(
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.stretch,
+//         children: <Widget>[
+//           buildHeader(context, collect),
+//           buildMenuItems(context, collect),
+//         ],
+//       ),
+//     ),
+//   );
+//   }
 
-  Widget buildHeader(BuildContext context, Collection collect) => Material(
-    color: const Color(0xFF404040),
-    child: InkWell(
-      onTap: () {},
-      child: Container(
-        padding: EdgeInsets.only(
-          top: 5 + MediaQuery.of(context).padding.top,
-          bottom: 15,
-          left: 15,
-        ),
-        child: Row(
-          children: [
-            const Icon(
-              Icons.account_circle,
-              size: 50,
-              color: Colors.white,
-            ),
-            const SizedBox(width: 5),
-            Text(
-            collect.getName(),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-            )
-          ),
-          ]
-        )
-      )
+//   Widget buildHeader(BuildContext context, Collection collect) => Material(
+//     color: const Color(0xFF404040),
+//     child: InkWell(
+//       onTap: () {},
+//       child: Container(
+//         padding: EdgeInsets.only(
+//           top: 5 + MediaQuery.of(context).padding.top,
+//           bottom: 15,
+//           left: 15,
+//         ),
+//         child: Row(
+//           children: [
+//             const Icon(
+//               Icons.account_circle,
+//               size: 50,
+//               color: Colors.white,
+//             ),
+//             const SizedBox(width: 5),
+//             Text(
+//             collect.getName(),
+//             style: const TextStyle(
+//               color: Colors.white,
+//               fontSize: 20,
+//             )
+//           ),
+//           ]
+//         )
+//       )
 
-    )
-  );
+//     )
+//   );
 
-  Widget buildMenuItems(BuildContext context, Collection collect) => Column(
-    children: [
-      ListTile(
-        leading: const Icon(Icons.home_outlined),
-        title: const Text('Home'),
-        onTap: () {},
-      ),
-      ListTile(
-        title: const Text('Collection'),
-        onTap: () {},
-      ),
-      ListTile(
-        title: const Text('Build a Deck'),
-        onTap: () {
-          collect.getCollectionPrice();
-        },
-      ),
-      const Divider(), 
-      ListTile(
-        leading: const Icon(Icons.exit_to_app), 
-        title: const Text('Sign Out'),
-        onTap: () async {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text("Logout"),
-                content: const Text("Are you sure you want to logout?"),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LogInScreen(),
-                        ),
-                      );
-                    },
-                    child: const Text("Yes"),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text("No"),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-      ),
-    ]
-  );
+//   Widget buildMenuItems(BuildContext context, Collection collect) => Column(
+//     children: [
+//       ListTile(
+//         leading: const Icon(Icons.home_outlined),
+//         title: const Text('Home'),
+//         onTap: () {},
+//       ),
+//       ListTile(
+//         title: const Text('Collection'),
+//         onTap: () {},
+//       ),
+//       ListTile(
+//         title: const Text('Build a Deck'),
+//         onTap: () {
+//           collect.getCollectionPrice();
+//         },
+//       ),
+//       const Divider(), 
+//       ListTile(
+//         leading: const Icon(Icons.exit_to_app), 
+//         title: const Text('Sign Out'),
+//         onTap: () async {
+//           showDialog(
+//             context: context,
+//             builder: (BuildContext context) {
+//               return AlertDialog(
+//                 title: const Text("Logout"),
+//                 content: const Text("Are you sure you want to logout?"),
+//                 actions: <Widget>[
+//                   TextButton(
+//                     onPressed: () {
+//                       Navigator.push(
+//                         context,
+//                         MaterialPageRoute(
+//                           builder: (context) => const LogInScreen(),
+//                         ),
+//                       );
+//                     },
+//                     child: const Text("Yes"),
+//                   ),
+//                   TextButton(
+//                     onPressed: () {
+//                       Navigator.pop(context);
+//                     },
+//                     child: const Text("No"),
+//                   ),
+//                 ],
+//               );
+//             },
+//           );
+//         },
+//       ),
+//     ]
+//   );
 
-}
+// }

@@ -6,11 +6,11 @@ class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
 
   @override
-  _ResetPasswordScreen createState() => _ResetPasswordScreen();
+  ResetPasswordScreenState createState() => ResetPasswordScreenState();
 
 }
 
-class _ResetPasswordScreen extends State<ResetPasswordScreen> {
+class ResetPasswordScreenState extends State<ResetPasswordScreen> {
     TextEditingController usernameController = TextEditingController();
     TextEditingController newPasswordController = TextEditingController();
     TextEditingController confirmNewPasswordController = TextEditingController();

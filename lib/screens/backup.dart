@@ -12,7 +12,6 @@ import 'package:tcg_app_sp/models/card.dart';
 
 class CollectionScreen extends StatefulWidget {
   final Collection collect;
-
   const CollectionScreen(this.collect, {Key? key}) : super(key: key);
 
   @override

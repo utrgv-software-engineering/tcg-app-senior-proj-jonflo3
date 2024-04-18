@@ -11,10 +11,10 @@ class CardInfoScreen extends StatefulWidget {
   const CardInfoScreen(this.index, this.collect, {super.key});
 
   @override
-  _CardInfoScreenState createState() => _CardInfoScreenState();
+  CardInfoScreenState createState() => CardInfoScreenState();
 }
 
-class _CardInfoScreenState extends State<CardInfoScreen> {
+class CardInfoScreenState extends State<CardInfoScreen> {
   late Future<List<dynamic>> cardInformation;
   late int length; 
   late CardInfo currentCard = CardInfo(); 
@@ -113,6 +113,8 @@ void showRemoveCardDialogue(BuildContext context, String cardName) {
                     ),
                   ),
                   Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(currentCard.getCardName(),
                         style: const TextStyle(
