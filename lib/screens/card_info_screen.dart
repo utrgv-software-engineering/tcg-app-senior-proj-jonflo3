@@ -1,8 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:tcg_app_sp/models/collection.dart';
 import 'collection_screen.dart';
-import 'package:tcg_app_sp/models/card.dart';
+
 
 class CardInfoScreen extends StatefulWidget {
   final int index;
@@ -15,35 +14,72 @@ class CardInfoScreen extends StatefulWidget {
 }
 
 class _CardInfoScreenState extends State<CardInfoScreen> {
-  late Future<List<dynamic>> cardInformation;
+  late Map<String,dynamic> cardInformation;
   late int length; 
-  late CardInfo currentCard = CardInfo(); 
+  //late CardInfo currentCard = CardInfo(); 
 
   @override
   void initState() {
     super.initState();
-    currentCard.setID(widget.collect.cardIds[widget.index]);
+    //currentCard.setID(widget.collect.cardIds[widget.index]);
     cardInformation = fetchCardInfo(widget.collect.cardIds[widget.index]);
 
   }
 
-  Future<List<dynamic>> fetchCardInfo(String id) async {
-    List<dynamic> cardInfo = [];
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('PokeCards').doc(id).get();
-    if (snapshot.exists) {
-      String name = snapshot['name'];
-      String rarity = snapshot['rarity'];
-      List cardType = snapshot['types'];
-      List stage = snapshot['subtypes'];
-      List attack = snapshot['attacks'];
-      List weakness = snapshot['weaknesses'];
-      List retreatCost = snapshot['retreatCost'];
-      String cardNum = snapshot['number'];
-      String imageUrl = snapshot['images']['small'];
-
-      cardInfo = [name, rarity, cardType, stage, attack, weakness, retreatCost, cardNum, imageUrl];
+  String getCardType() {
+    List types = cardInformation['poke type'];
+    String type = '';
+    for(var i = 0; i < types.length; i++){
+      type = "${type + types[i]} "; 
     }
-    return cardInfo;
+    return type;
+  }
+
+  String getCardStage() {
+    List stages = cardInformation['stage'];
+    String stage = '';
+    for(var i = 0; i < stages.length; i++){
+      stage = "${stage + stages[i]} "; 
+    }
+    return stage;
+  }
+
+  String getCardMoves() {
+    List moves = cardInformation['moves'];
+    String move = "Attacks: \n";
+    for(var i = 0; i < moves.length; i++){
+      if(i == moves.length - 1){
+        move = "${move + moves[i]['name']} ${moves[i]['text']}"; 
+      }else if(i < moves.length - 1){
+        move = "${move + moves[i]['name']} ${moves[i]['text']}  \n"; 
+      }
+    }
+    return move;
+  }
+
+  String getCardWeakness() {
+    List weak = cardInformation['weakness'];
+    String weakness = "";
+    for(var i = 0; i < weak.length; i++){
+      weakness = "${weakness + weak[i]['type']} " +  weak[i]['value'];
+    }
+    return weakness;
+  }
+
+  String getCardRules() {
+    List rule = cardInformation['rules'];
+    String rules = "";
+    for(var i = 0; i < rule.length; i++){
+      rules = "${rules + rule[i][i]} ";
+    }
+    return rules;
+  }
+
+  Map<String,dynamic> fetchCardInfo(String id) {
+    Map<String,dynamic> cardInfo;
+    cardInfo = widget.collect.allCards.firstWhere((element) => element['id'] == id);
+
+   return cardInfo;
   }
 
 
@@ -89,67 +125,117 @@ void showRemoveCardDialogue(BuildContext context, String cardName) {
         IconButton(
           icon: const Icon(Icons.delete),
           onPressed: () async {
-              showRemoveCardDialogue(context, currentCard.getCardName());
+              showRemoveCardDialogue(context, 'Card');
           },
         ),
       ],
       ),
-      body: FutureBuilder<List<dynamic>>(
-        future: cardInformation, 
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('ERROR: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Container(
-                    alignment: Alignment.topCenter,
-                    child: Image.network(
-                    currentCard.getImageURL(),
-                    ),
+      body: Center(
+        child: cardInformation['type'] == 'Pokémon'
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  alignment: Alignment.topCenter,
+                  child: Image.network(
+                    cardInformation['imgURL'],
                   ),
-                  Row(
-                    children: [
-                      Text(currentCard.getCardName(),
-                        style: const TextStyle(
-                          color: Color.fromARGB(255, 7, 6, 6),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 35,
-                        ),
+                ),
+                Row(
+                  children: [
+                    Text(cardInformation['name'],
+                      style: const TextStyle(
+                        color: Color.fromARGB(255, 7, 6, 6),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 35,
                       ),
+                    ),
+                  ],
+                ),
+                Container(
+                  alignment: Alignment.topLeft,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('${cardInformation['type']} Card',
+                        style: const TextStyle(
+                        color: Color.fromARGB(255, 7, 6, 6),
+                        fontSize: 25,)
+                      ),
+                      Text('Rarity: ${cardInformation['rarity']}'),
+                      Text('Card Type: ${getCardType()}'),
+                      Text('Stage: ${getCardStage()}'),
+                      Text(getCardMoves()),
+                      Text('Weakness: ${getCardWeakness()}'),
+                      Text('Card Number: ${cardInformation['number']}'),
                     ],
                   ),
-                  Container(
-                    alignment: Alignment.topLeft,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Card Information',
-                          style: TextStyle(
-                          color: Color.fromARGB(255, 7, 6, 6),
-                          fontSize: 25,)
-                        ),
-                        Text("Rarity: ${currentCard.getRarity()}"),
-                        Text('Card Type: ${currentCard.getCardType()}'),
-                        Text('Stage: ${currentCard.getCardStage()}'),
-                        Text(currentCard.getCardMoves()),
-                        Text('Weakness: ${currentCard.getCardWeakness()}'),
-                        Text('Card Number: ${currentCard.getCardNum()}'),
-                      ],
+                ),
+              ],
+            )
+          : cardInformation['type'] == 'Trainer'
+          ? Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                alignment: Alignment.topCenter,
+                child: Image.network(
+                  cardInformation['imgURL'],
+                ),
+              ),
+              Row(
+                children: [
+                  Text(cardInformation['name'],
+                    style: const TextStyle(
+                      color: Color.fromARGB(255, 7, 6, 6),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 35,
                     ),
                   ),
                 ],
               ),
-            );
-          } else {
-            return const Center(child: Text('No Data'));
-          }
-        },
+              Container(
+                alignment: Alignment.topLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${cardInformation['type']} Card',
+                      style: const TextStyle(
+                      color: Color.fromARGB(255, 7, 6, 6),
+                      fontSize: 25,)
+                    ),
+                    Text('Rarity: ${cardInformation['rarity']}'),
+                    Text('Rules: ${cardInformation['rules']}'),
+                    Text('Card Number: ${cardInformation['number']}'),
+                  ],
+                ),
+              ),
+            ]
+          )
+          : Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                alignment: Alignment.topCenter,
+                child: Image.network(
+                  cardInformation['imgURL'],
+                ),
+              ),
+              Row(
+                children: [
+                  Text(cardInformation['name'],
+                    style: const TextStyle(
+                      color: Color.fromARGB(255, 7, 6, 6),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 35,
+                    ),
+                  ),
+                ],
+              ),
+            ]
+          )
       ),
+        
     );
   }
 }

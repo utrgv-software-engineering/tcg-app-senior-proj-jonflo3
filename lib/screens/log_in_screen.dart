@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tcg_app_sp/SQLite/sqlite.dart';
 import 'package:tcg_app_sp/models/userinfo.dart';
-import 'package:tcg_app_sp/screens/collection_screen.dart';
+import 'package:tcg_app_sp/screens/menu_screen.dart';
 import 'package:tcg_app_sp/models/collection.dart';
 import 'package:tcg_app_sp/screens/reset_password_screen.dart';
 // import 'package:tcg_app_sp/screens/sign_up_screen.dart';
@@ -30,7 +30,7 @@ class _LogInScreen extends State<LogInScreen>{
       Collection collect = Collection(cardIds: [], username: usernameController.text);
       await collect.fetchUserData();
       Navigator.pushReplacement(context, MaterialPageRoute(
-        builder: (context) => CollectionScreen(collect),
+        builder: (context) => MenuScreen(collect),
       ),);
     } else {
       if(!mounted) return;
