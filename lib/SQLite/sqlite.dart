@@ -1,13 +1,22 @@
-// import 'package:path/path.dart';
+//import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:tcg_app_sp/models/userinfo.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart';
+
 class DataBaseHelper{
   final databaseName = "users.db";
+  final collectionDataBaseName = "collection.db";
+  String collectionTable = "CREATE TABLE collection (cardID TEXT, user TEXT, cardName TEXT, imgURL TEXT, cardType TEXT, PRIMARY KEY (cardID, user))";
   String userTable = "CREATE TABLE users (usrId INTEGER PRIMARY KEY AUTOINCREMENT, usrName TEXT UNIQUE NOT NULL, usrPassword TEXT NOT NULL)";
 
   Future<Database> initDB() async {
-    return openDatabase(databaseName, version: 2, onCreate: (db, version) async {
+    final documentsDirectory = await getApplicationDocumentsDirectory();
+    final path = join(documentsDirectory.path, databaseName);
+
+    return openDatabase(path, version: 3, onCreate: (db, version) async {
       await db.execute(userTable);
+      await db.execute(collectionTable);
     });
   }
   

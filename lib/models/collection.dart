@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:tcg_app_sp/models/decks.dart';
 
 //import 'package:tcg_app_sp/screens/deck_construction_menu_screen.dart';
 
@@ -9,6 +10,8 @@ class Collection {
   List<String> cardIds;
   String username = '';
   double collectionPrice = 0.0;
+  Decks myDecks;
+
 
 
 
@@ -183,7 +186,6 @@ class Collection {
         allCards.add(newEntry);
       }else{
         String cardName = snapshot['name'];
-        //String cardRarity = snapshot['rarity'];
         String cardType = snapshot['supertype'];
         String cardNum = snapshot['number'];
         String imgURL = snapshot['images']['small'];
@@ -191,7 +193,6 @@ class Collection {
         Map<String, dynamic> newEntry = {
           'id': cardID,
           'name': cardName,
-          //'rarity': cardRarity,
           'type': cardType,
           'number': cardNum,
           'imgURL': imgURL,
@@ -223,9 +224,10 @@ class Collection {
   }
 
   //Constructors 
-  Collection({required this.cardIds, required this.username,}) {
+  Collection({required this.cardIds, required this.username,}) 
+    : myDecks = Decks() {
     assignUserName(username);
-    fetchUserData();
+
   }
 
   factory Collection.fromJson(Map<String, dynamic> json, String username) {

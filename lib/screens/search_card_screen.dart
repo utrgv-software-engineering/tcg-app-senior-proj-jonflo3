@@ -39,6 +39,7 @@ class SearchCardScreenState extends State<SearchCardScreen> {
                     .doc(widget.collect.username)
                     .set(widget.collect.toJson());
 
+                // ignore: use_build_context_synchronously
                 Navigator.pop(context, widget.collect);
                 if (mounted) {
                   setState(() {
