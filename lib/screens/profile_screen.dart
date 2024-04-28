@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tcg_app_sp/models/card.dart';
 import 'package:tcg_app_sp/models/collection.dart';
+import 'package:tcg_app_sp/models/userinfo.dart';
 import 'package:tcg_app_sp/screens/card_info_screen.dart';
 import 'package:tcg_app_sp/screens/collection_screen.dart';
 
@@ -9,7 +10,6 @@ class ProfileScreen extends StatefulWidget {
   final Collection collect;
 
   const ProfileScreen(this.collect, {super.key});
-  // const ProfileScreen(this.collect, {super.key});
 
   @override
   ProfileScreenState createState() => ProfileScreenState();
@@ -17,6 +17,8 @@ class ProfileScreen extends StatefulWidget {
 
 class ProfileScreenState extends State<ProfileScreen>{
   late Future<List<String>> futureImageUrls;
+  late String usrName = widget.collect.getName();
+  late double collectionPrice = 0.0;
 
   // @override
   // void initState() {
@@ -46,18 +48,12 @@ class ProfileScreenState extends State<ProfileScreen>{
         leading: IconButton(
           onPressed: () async {
             Navigator.pop(context);
-            // Navigator.push(
-            //   context, 
-            //   MaterialPageRoute(
-            //     builder: (context) => CollectionScreen(widget.collect, widget.username),
-            //   )
-            // );
           },
           icon: const Icon(Icons.home),
           ),
-        title: const Text(
-          'Hello, admin!',
-          style: TextStyle(
+        title: Text(
+          'Hello, $usrName!',
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
@@ -70,18 +66,32 @@ class ProfileScreenState extends State<ProfileScreen>{
               const SizedBox(height: 10),
               const CircleAvatar(
                 radius: 50,
-                backgroundImage: AssetImage('./lib/images/placeholder.jpg'),
+                backgroundImage: NetworkImage('https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg'),
               ),
-              const Text('admin',
-              style: TextStyle(
+              Text(usrName,
+              style: const TextStyle(
                 fontSize: 24,
               ),
               ),
               const SizedBox(height: 5),
-              const Text('Current value: \$9,999,999.99',
-              style: TextStyle(
-                fontSize: 18,
-              ),
+              // const Text('Current value: \$9,999,999',
+              // style: TextStyle(
+              //   fontSize: 18,
+              // ),
+              // ),
+              FutureBuilder<double>(
+                future: widget.collect.getCollectionPrice(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator(); // Or some other loading indicator
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    collectionPrice = snapshot.data!;
+                    // Now you can use collectionPrice as a double value
+                    return Text('Collection Price: \$${collectionPrice.toStringAsFixed(2)}', style: const TextStyle(fontSize: 18),);
+                  }
+                },
               ),
               const SizedBox(height: 5),
               const Text('Total cards: 999',
@@ -114,15 +124,15 @@ class ProfileScreenState extends State<ProfileScreen>{
                     const Text("Bulbasaur"),
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Image.network('https://m.media-amazon.com/images/I/71U+6OllbdL._AC_UF894,1000_QL80_DpWeblab_.jpg', height: 125,),
-                    const Text("Mewtwo"),
-                    Image.network('https://product-images.tcgplayer.com/fit-in/437x437/253176.jpg', height: 125,),
-                    const Text("Mew"),
-                  ],
-                ),                
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //   children: <Widget>[
+                //     Image.network('https://m.media-amazon.com/images/I/71U+6OllbdL._AC_UF894,1000_QL80_DpWeblab_.jpg', height: 125,),
+                //     const Text("Mewtwo"),
+                //     Image.network('https://product-images.tcgplayer.com/fit-in/437x437/253176.jpg', height: 125,),
+                //     const Text("Mew"),
+                //   ],
+                // ),                
               // FutureBuilder<List<String>>(
               //   future: futureImageUrls,
               //   builder: (context, snapshot) {

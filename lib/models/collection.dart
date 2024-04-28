@@ -102,25 +102,34 @@ class Collection {
     return username;
   }
 
-  Future<void> getCollectionPrice() async {
+  Future<double> getCollectionPrice() async {
     String apiBase = 'https://api.pokemontcg.io/v2/cards';
-    collectionPrice = 0; 
-    for(int i = 0; i < cardIds.length; i++){
+
+    for (int i = 0; i < cardIds.length; i++) {
       String curID = cardIds[i];
       var response = await http.get(Uri.parse('$apiBase?q=id:$curID'));
 
       if (response.statusCode == 200) {
         Map<String, dynamic> data = json.decode(response.body);
-
-        double averageSellPrice;
-        if (data['data'][0]['tcgplayer']['prices']['holofoil'] != null) {
-          averageSellPrice = data['data'][0]['tcgplayer']['prices']['holofoil']['market'];
-        } else {
-          averageSellPrice = data['data'][0]['tcgplayer']['prices']['normal']['market'];
+        // Check if the data contains the expected structure
+        if (data.containsKey('tcgplayer') && data['tcgplayer'] != null) {
+          // Access the "prices" object within "tcgplayer"
+          var prices = data['data'][0]['tcgplayer']['prices'];
+          // Check if the "prices" object exists and is not null
+          if (prices != null) {
+            // Access the "market" variable within "prices"
+            double marketPrice;
+            if (prices['holofoil'] != null) {
+              marketPrice = prices['holofoil']['market'];
+            } else {
+              marketPrice = prices['normal']['market'];
+            }
+            collectionPrice += marketPrice;
+          }
         }
-        collectionPrice = collectionPrice + averageSellPrice; 
-      } 
+      }
     }
+    return collectionPrice;
   }
 
   //SECTION 2
