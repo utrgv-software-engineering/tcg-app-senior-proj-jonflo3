@@ -2,9 +2,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:tcg_app_sp/firebase_options.dart';
 import 'package:tcg_app_sp/screens/log_in_screen.dart';
+import 'package:tcg_app_sp/SQLite/sqlite.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  DataBaseHelper db = DataBaseHelper();
+  await db.initDB();
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }

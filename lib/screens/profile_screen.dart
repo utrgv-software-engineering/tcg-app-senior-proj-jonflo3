@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tcg_app_sp/models/card.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:tcg_app_sp/models/card.dart';
 import 'package:tcg_app_sp/models/collection.dart';
-import 'package:tcg_app_sp/screens/card_info_screen.dart';
-import 'package:tcg_app_sp/screens/collection_screen.dart';
+//import 'package:tcg_app_sp/screens/card_info_screen.dart';
+//import 'package:tcg_app_sp/screens/collection_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final Collection collect;

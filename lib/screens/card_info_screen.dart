@@ -61,6 +61,7 @@ class _CardInfoScreenState extends State<CardInfoScreen> {
     List weak = cardInformation['weakness'];
     String weakness = "";
     for(var i = 0; i < weak.length; i++){
+      // ignore: prefer_interpolation_to_compose_strings
       weakness = "${weakness + weak[i]['type']} " +  weak[i]['value'];
     }
     return weakness;

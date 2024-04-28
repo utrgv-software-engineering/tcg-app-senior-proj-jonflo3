@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tcg_app_sp/models/collection.dart';
-import 'package:tcg_app_sp/screens/deck_builder_screen.dart';
+import 'package:tcg_app_sp/screens/deck_menu_screen.dart';
 import 'package:tcg_app_sp/screens/log_in_screen.dart';
 import 'package:tcg_app_sp/screens/collection_screen.dart';
 import 'package:tcg_app_sp/screens/profile_screen.dart';
@@ -16,6 +16,8 @@ class MenuScreen extends StatefulWidget {
 }
 
 class MenuScreenState extends State<MenuScreen> {
+  
+
   @override
   void initState() {
     super.initState();
@@ -100,7 +102,7 @@ class MenuScreenState extends State<MenuScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => DeckBuilderScreen(widget.collect)));
+                  MaterialPageRoute(builder: (context) => DeckMenuScreen(widget.collect)));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF404040),
