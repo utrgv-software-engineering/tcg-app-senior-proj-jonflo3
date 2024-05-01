@@ -74,15 +74,20 @@ class CardInfo {
     //List<dynamic> cardInfo = [];
     DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('PokeCards').doc(cardID).get();
     if (snapshot.exists) {
-      _cardName = snapshot['name'];
-      _cardRarity = snapshot['rarity'];
-      _cardType = snapshot['types'];
-      _stage = snapshot['subtypes'];
-      _moves = snapshot['attacks'];
-      _weakness = snapshot['weaknesses'];
-      _retreatCost = snapshot['retreatCost'];
-      _cardNum = snapshot['number'];
-      _imgURL = snapshot['images']['small'];
+      if (snapshot['supertype'] == 'Energy'){
+        _cardName = snapshot['name'];
+        _imgURL = snapshot['images']['small'];
+      }else {
+        _cardName = snapshot['name'];
+        _cardRarity = snapshot['rarity'];
+        _cardType = snapshot['types'];
+        _stage = snapshot['subtypes'];
+        _moves = snapshot['attacks'];
+        _weakness = snapshot['weaknesses'];
+        _retreatCost = snapshot['retreatCost'];
+        _cardNum = snapshot['number'];
+        _imgURL = snapshot['images']['small'];
+      }
 
     }
 

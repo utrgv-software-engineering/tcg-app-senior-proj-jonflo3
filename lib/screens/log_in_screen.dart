@@ -24,16 +24,22 @@ class _LogInScreen extends State<LogInScreen>{
   final db = DataBaseHelper();
 
   Future<void> login() async {
+    showDialog(
+      context: context, 
+      builder: (context){
+        return const Center(child: CircularProgressIndicator());
+    });
     var response = await db.login(Users(usrName: usernameController.text, usrPassword: passwordController.text));
     if(response == true){
       if(!mounted) return;
       Collection collect = Collection(cardIds: [], username: usernameController.text);
       await collect.fetchUserData();
-      Navigator.pushReplacement(context, MaterialPageRoute(
+      Navigator.push(context, MaterialPageRoute(
         builder: (context) => MenuScreen(collect),
       ),);
     } else {
       if(!mounted) return;
+      Navigator.of(context).pop();
       showDialog(
         context: context,
         builder: (BuildContext context){ 

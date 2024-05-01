@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:tcg_app_sp/models/decks.dart';
+import 'package:tcg_app_sp/SQLite/sqlite.dart';
+
 
 //import 'package:tcg_app_sp/screens/deck_construction_menu_screen.dart';
 
@@ -9,8 +11,8 @@ class Collection {
   List<Map<String, dynamic>> allCards = [];
   List<String> cardIds;
   String username = '';
-  double collectionPrice = 0.0;
   Decks myDecks;
+  
 
 
 
@@ -20,15 +22,9 @@ class Collection {
   }
 
   Future<void> updateCardIDs() async {
-    List<String> cardIDsList = [];
-
-    DocumentReference userDocRef = FirebaseFirestore.instance.collection('usersAndTheirCollection').doc(username);
-    DocumentSnapshot snapshot = await userDocRef.get();
-    if (snapshot.exists) {
-      List<dynamic> idLIST = snapshot['PokeIDs'];
-      cardIDsList = List<String>.from(idLIST.map((id) => id.toString()));
-      cardIds = cardIDsList; 
-    } 
+    final db = DataBaseHelper();
+    List<String> cardIDsList = await db.getCardIdsForUser(getName());
+    cardIds = cardIDsList;
 
     for(int i = 0; i < cardIds.length; i++){
       DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('PokeCards').doc(cardIds[i]).get();
@@ -105,25 +101,36 @@ class Collection {
     return username;
   }
 
-  Future<void> getCollectionPrice() async {
+  Future<double> getCollectionPrice() async {
     String apiBase = 'https://api.pokemontcg.io/v2/cards';
-    collectionPrice = 0; 
-    for(int i = 0; i < cardIds.length; i++){
+    double collectionPrice = 0.0;
+
+    for (int i = 0; i < cardIds.length; i++) {
       String curID = cardIds[i];
       var response = await http.get(Uri.parse('$apiBase?q=id:$curID'));
 
       if (response.statusCode == 200) {
         Map<String, dynamic> data = json.decode(response.body);
 
-        double averageSellPrice;
-        if (data['data'][0]['tcgplayer']['prices']['holofoil'] != null) {
-          averageSellPrice = data['data'][0]['tcgplayer']['prices']['holofoil']['market'];
-        } else {
-          averageSellPrice = data['data'][0]['tcgplayer']['prices']['normal']['market'];
+        // Check if the data contains the expected structure
+        if (data['data'][0]['tcgplayer'] != null) {
+          // Access the "prices" object within "tcgplayer"
+          var prices = data['data'][0]['tcgplayer']['prices'];
+          // Check if the "prices" object exists and is not null
+          if (prices != null) {
+            // Access the "market" variable within "prices"
+            double marketPrice = 0.0;
+            if (prices['holofoil'] != null) {
+              marketPrice = prices['holofoil']['market'];
+            } else {
+              marketPrice = prices['normal']['market'];
+            }
+            collectionPrice += marketPrice;
+          }
         }
-        collectionPrice = collectionPrice + averageSellPrice; 
       } 
     }
+    return collectionPrice;
   }
 
   //SECTION 2
@@ -138,6 +145,18 @@ class Collection {
     DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('PokeCards').doc(cardID).get();
 
     if (snapshot.exists) {
+      String cardName = snapshot['name'];
+      cardName = cardName.replaceAll("'", "''");
+      String imgURL = snapshot['images']['small'];
+      String cardType = snapshot['supertype'];
+      final db = DataBaseHelper();
+      db.addCardToCollection(
+      cardID, 
+      getName(), 
+      cardName, 
+      imgURL, 
+      cardType
+      );
       if(snapshot['supertype'] == 'Pokémon'){
         String cardName = snapshot['name'];
         String cardRarity = snapshot['rarity'];
@@ -202,6 +221,7 @@ class Collection {
       }
     }
 
+
   }
 
 
@@ -220,6 +240,12 @@ class Collection {
 
     } 
 
+    final db = DataBaseHelper();
+      db.deleteCardFromCollection(
+      id, 
+      getName(), 
+    );
+    
     cardIds.removeAt(index);
   }
 
