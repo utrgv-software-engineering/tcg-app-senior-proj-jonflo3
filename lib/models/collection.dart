@@ -8,7 +8,7 @@ class Collection {
   List<Map<String, dynamic>> allCards = [];
   List<String> cardIds;
   String username = '';
-  double collectionPrice = 0.0;
+
 
 
 
@@ -103,6 +103,7 @@ class Collection {
   }
 
   Future<double> getCollectionPrice() async {
+    double collectionPrice = 0.0;
     String apiBase = 'https://api.pokemontcg.io/v2/cards';
 
     for (int i = 0; i < cardIds.length; i++) {
@@ -112,13 +113,13 @@ class Collection {
       if (response.statusCode == 200) {
         Map<String, dynamic> data = json.decode(response.body);
         // Check if the data contains the expected structure
-        if (data.containsKey('tcgplayer') && data['tcgplayer'] != null) {
+        if (data['data'][0]['tcgplayer'] != null) {
           // Access the "prices" object within "tcgplayer"
           var prices = data['data'][0]['tcgplayer']['prices'];
           // Check if the "prices" object exists and is not null
           if (prices != null) {
             // Access the "market" variable within "prices"
-            double marketPrice;
+            double marketPrice = 0.0;
             if (prices['holofoil'] != null) {
               marketPrice = prices['holofoil']['market'];
             } else {

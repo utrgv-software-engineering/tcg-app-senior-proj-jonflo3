@@ -17,26 +17,35 @@ class ProfileScreen extends StatefulWidget {
 
 class ProfileScreenState extends State<ProfileScreen>{
   late Future<List<String>> futureImageUrls;
-  late String usrName = widget.collect.getName();
+  late String usrName;
   late double collectionPrice = 0.0;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   futureImageUrls = fetchImageUrls(widget.collect.cardIds);
-  // }
+  @override
+  void initState() {
+    super.initState();
+    usrName = widget.collect.getName();
+    futureImageUrls = Future.value([]);
+    initializeImageUrls();
+  }
 
-  // Future<List<String>> fetchImageUrls(List<String> cardIds) async {
-  //   List<String> imageUrls = [];
-  //   for (String cardId in cardIds) {
-  //     DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('PokeCards').doc(cardId).get();
-  //     if (snapshot.exists) {
-  //       String imageUrl = snapshot['images']['small'];
-  //       imageUrls.add(imageUrl);
-  //     }
-  //   }
-  //   return imageUrls;
-  // }
+  Future<void> initializeImageUrls() async {
+    List<String> imageUrls = await fetchImageUrls(widget.collect.cardIds);
+    setState(() {
+      futureImageUrls = Future.value(imageUrls);
+    });
+  }
+
+  Future<List<String>> fetchImageUrls(List<String> cardIds) async {
+    List<String> imageUrls = [];
+    for (String cardId in cardIds) {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('PokeCards').doc(cardId).get();
+      if (snapshot.exists) {
+        String imageUrl = snapshot['images']['small'];
+        imageUrls.add(imageUrl);
+      }
+    }
+    return imageUrls;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,11 +83,6 @@ class ProfileScreenState extends State<ProfileScreen>{
               ),
               ),
               const SizedBox(height: 5),
-              // const Text('Current value: \$9,999,999',
-              // style: TextStyle(
-              //   fontSize: 18,
-              // ),
-              // ),
               FutureBuilder<double>(
                 future: widget.collect.getCollectionPrice(),
                 builder: (context, snapshot) {
@@ -105,77 +109,74 @@ class ProfileScreenState extends State<ProfileScreen>{
                 fontSize: 18,
               ),
               ),
-              const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Image.network('https://product-images.tcgplayer.com/451703.jpg', height: 125,),
-                    const Text("Pikachu"),
-                    Image.network('https://m.media-amazon.com/images/I/71nbfl-JklS._AC_UF894,1000_QL80_.jpg', height: 125,),
-                    const Text("Charizard"),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Image.network('https://m.media-amazon.com/images/I/51An2H2TLdL._AC_UF894,1000_QL80_.jpg', height: 125,),
-                    const Text("Squirtle"),
-                    Image.network('https://product-images.tcgplayer.com/274433.jpg', height: 125,),
-                    const Text("Bulbasaur"),
-                  ],
-                ),
+              // const SizedBox(height: 10),
                 // Row(
                 //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 //   children: <Widget>[
-                //     Image.network('https://m.media-amazon.com/images/I/71U+6OllbdL._AC_UF894,1000_QL80_DpWeblab_.jpg', height: 125,),
-                //     const Text("Mewtwo"),
-                //     Image.network('https://product-images.tcgplayer.com/fit-in/437x437/253176.jpg', height: 125,),
-                //     const Text("Mew"),
+                //     Image.network('https://product-images.tcgplayer.com/451703.jpg', height: 125,),
+                //     const Text("Pikachu"),
+                //     Image.network('https://m.media-amazon.com/images/I/71nbfl-JklS._AC_UF894,1000_QL80_.jpg', height: 125,),
+                //     const Text("Charizard"),
                 //   ],
-                // ),                
-              // FutureBuilder<List<String>>(
-              //   future: futureImageUrls,
-              //   builder: (context, snapshot) {
-              //     if (snapshot.connectionState == ConnectionState.waiting) {
-              //       return const CircularProgressIndicator();
-              //     } else if (snapshot.hasError) {
-              //       return Text('ERROR: ${snapshot.error}');
-              //     } else if (snapshot.hasData) {
-              //       final List<String> imageUrls = snapshot.data!;
-              //       return Padding(
-              //         padding: const EdgeInsets.all(10),
-              //         child: GridView.builder(
-              //           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              //             crossAxisCount: 4,
-              //             crossAxisSpacing: 10,
-              //             mainAxisSpacing: 5,
-              //             childAspectRatio: 735 / 1025,
-              //           ),
-              //           itemCount: imageUrls.length,
-              //           itemBuilder: (context, index) {
-              //             return GestureDetector(
-              //               onTap: () {
-              //                 CardInfo currentCard = CardInfo();
-              //                 currentCard.setID(widget.collect.cardIds[index]);
-              //                 Navigator.push(
-              //                   context,
-              //                   MaterialPageRoute(
-              //                     builder: (context) => CardInfoScreen(index, widget.collect, widget.username),
-              //                   ),
-              //                 );
-              //               },
-              //               child: Image.network(
-              //                 imageUrls[index],
-              //               ),
-              //             );
-              //           },
-              //         ),
-              //       );
-              //     } else {
-              //       return const Text('No Data');
-              //     }
-              //   },
-              // ),
+                // ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //   children: <Widget>[
+                //     Image.network('https://m.media-amazon.com/images/I/51An2H2TLdL._AC_UF894,1000_QL80_.jpg', height: 125,),
+                //     const Text("Squirtle"),
+                //     Image.network('https://product-images.tcgplayer.com/274433.jpg', height: 125,),
+                //     const Text("Bulbasaur"),
+                //   ],
+                // ),              
+              Expanded(
+                child: ListView(
+                  children: [
+                    FutureBuilder<List<String>>(
+                      future: futureImageUrls,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text('ERROR: ${snapshot.error}');
+                        } else if (snapshot.hasData) {
+                          final List<String> imageUrls = snapshot.data!;
+                          return Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: GridView.builder(
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 4,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 5,
+                                childAspectRatio: 735 / 1025,
+                              ),
+                              itemCount: imageUrls.length,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    CardInfo currentCard = CardInfo();
+                                    currentCard.setID(widget.collect.cardIds[index]);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => CardInfoScreen(index, widget.collect),
+                                      ),
+                                    );
+                                  },
+                                  child: Image.network(
+                                    imageUrls[index],
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        } else {
+                          return const Text('No Data');
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
