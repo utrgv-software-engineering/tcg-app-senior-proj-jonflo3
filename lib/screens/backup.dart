@@ -1,19 +1,17 @@
-// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tcg_app_sp/models/collection.dart';
-import 'package:tcg_app_sp/screens/log_in_screen.dart';
-// import 'package:tcg_app_sp/screens/log_in_screen.dart';
 import 'package:tcg_app_sp/screens/search_card_screen.dart';
 import 'package:tcg_app_sp/screens/card_info_screen.dart';
 import 'package:tcg_app_sp/models/card.dart';
-//import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:tcg_app_sp/auth.dart';
+import 'package:tcg_app_sp/screens/menu_screen.dart';
+import 'package:tcg_app_sp/SQLite/sqlite.dart';
+//import 'package:tcg_app_sp/screens/deck_builder_screen.dart';
 
 class CollectionScreen extends StatefulWidget {
   final Collection collect;
 
-  const CollectionScreen(this.collect, {Key? key}) : super(key: key);
+  const CollectionScreen(this.collect, {super.key});
 
   @override
   CollectionScreenState createState() => CollectionScreenState();
@@ -25,10 +23,16 @@ class CollectionScreenState extends State<CollectionScreen> {
   @override
   void initState() {
     super.initState();
-    futureImageUrls = fetchImageUrls(widget.collect.cardIds);
+    fetchImageUrls(widget.collect.username);
   }
 
-  Future<List<String>> fetchImageUrls(List<String> cardIds) async {
+  Future<void> fetchImageUrls(String user) async {
+    List<String> urls = await DataBaseHelper().getImageUrlsForUser(user);
+    setState(() {
+      futureImageUrls = Future.value(urls);
+    });
+  }
+  /*Future<List<String>> fetchImageUrls(List<String> cardIds) async {
     List<String> imageUrls = [];
     for (String cardId in cardIds) {
       DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('PokeCards').doc(cardId).get();
@@ -38,21 +42,29 @@ class CollectionScreenState extends State<CollectionScreen> {
       }
     }
     return imageUrls;
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF404040),
+        backgroundColor: const Color(0xFF404040), 
+        elevation: 0, 
+        iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.push(context,MaterialPageRoute(builder: (context) => MenuScreen(widget.collect),));
+          },
+        ), 
         title: const Text(
           'Collection',
           style: TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.bold, // Customize text color
+            fontWeight: FontWeight.bold,
           ),
         ),
-        automaticallyImplyLeading: false,
+        centerTitle: true, 
         actions: [
           IconButton(
             onPressed: () async {
@@ -69,46 +81,8 @@ class CollectionScreenState extends State<CollectionScreen> {
               color: Colors.white,
             ),
           ),
-          IconButton(
-            onPressed: () async {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text("Logout"),
-                    content: const Text("Are you sure you want to logout?"),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const LogInScreen(),
-                            ),
-                          );
-                        },
-                        child: const Text("Yes"),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text("No"),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-            icon: const Icon(
-              Icons.logout,
-              size: 35,
-              color: Colors.white,
-            ),
-          ),
-        ],
+        ]
       ),
-      drawer: const NavigationDrawer(),
       body: Center(
         child: FutureBuilder<List<String>>(
           future: futureImageUrls,
@@ -154,98 +128,6 @@ class CollectionScreenState extends State<CollectionScreen> {
           },
         ),
       ),
-      /*bottomNavigationBar: BottomAppBar(
-        color: const Color(0xFF404040),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5), // Adjusted vertical padding
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.autorenew,
-                    size: 35,
-                    color: Colors.white,
-                  ),
-                ),
-                Spacer(),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.folder_open,
-                    size: 35,
-                    color: Colors.white,
-                  ),
-                ),
-                Spacer(),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.account_circle,
-                    size: 35,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),*/
     );
   }
-}
-
-class NavigationDrawer extends StatelessWidget {
-  const NavigationDrawer({super.key});
-
-  @override 
-  Widget build(BuildContext context) {
-    return Drawer(
-    child: SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          buildHeader(context),
-          buildMenuItems(context),
-        ],
-      ),
-    ),
-  );
-  }
-
-  Widget buildHeader(BuildContext context) => const DrawerHeader(
-    decoration: BoxDecoration(
-      color: Colors.blue,
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(
-          Icons.account_circle,
-          size: 50,
-          color: Colors.white,
-        ),
-        Text(
-          'User Name',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget buildMenuItems(BuildContext context) => Column(
-    children: [
-      ListTile(
-        leading: const Icon(Icons.home_outlined),
-        title: const Text('Home'),
-        onTap: () {},
-      )
-    ]
-  );
-
 }

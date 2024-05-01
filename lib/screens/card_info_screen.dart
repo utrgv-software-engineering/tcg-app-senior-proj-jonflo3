@@ -213,7 +213,8 @@ void showRemoveCardDialogue(BuildContext context, String cardName) {
               ),
             ]
           )
-          : Column(
+          : cardInformation['type'] == 'Energy'
+          ? Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Container(
@@ -235,6 +236,23 @@ void showRemoveCardDialogue(BuildContext context, String cardName) {
               ),
             ]
           )
+          : const Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text('no information',
+                    style: const TextStyle(
+                      color: Color.fromARGB(255, 7, 6, 6),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 35,
+                    ),
+                  ),
+                ],
+              ),
+            ]
+          )
+
       ),
         
     );

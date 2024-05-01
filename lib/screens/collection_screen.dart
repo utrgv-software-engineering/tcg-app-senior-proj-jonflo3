@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tcg_app_sp/models/collection.dart';
-import 'package:tcg_app_sp/screens/search_card_screen.dart';
 import 'package:tcg_app_sp/screens/card_info_screen.dart';
 import 'package:tcg_app_sp/models/card.dart';
+import 'package:tcg_app_sp/models/collection.dart';
+import 'package:tcg_app_sp/screens/search_card_screen.dart';
 import 'package:tcg_app_sp/screens/menu_screen.dart';
+import 'package:tcg_app_sp/SQLite/sqlite.dart';
 //import 'package:tcg_app_sp/screens/deck_builder_screen.dart';
 
 class CollectionScreen extends StatefulWidget {
   final Collection collect;
+  
 
   const CollectionScreen(this.collect, {super.key});
 
@@ -17,24 +18,19 @@ class CollectionScreen extends StatefulWidget {
 }
 
 class CollectionScreenState extends State<CollectionScreen> {
-  late Future<List<String>> futureImageUrls;
+  List<String> imgURLs = [];
 
   @override
   void initState() {
     super.initState();
-    futureImageUrls = fetchImageUrls(widget.collect.cardIds);
+    fetchImageUrls(widget.collect.username);
   }
 
-  Future<List<String>> fetchImageUrls(List<String> cardIds) async {
-    List<String> imageUrls = [];
-    for (String cardId in cardIds) {
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('PokeCards').doc(cardId).get();
-      if (snapshot.exists) {
-        String imageUrl = snapshot['images']['small'];
-        imageUrls.add(imageUrl);
-      }
-    }
-    return imageUrls;
+  Future<void> fetchImageUrls(String user) async {
+    List<String> urls = await DataBaseHelper().getImageUrlsForUser(user);
+    setState(() {
+      imgURLs = urls;
+    });
   }
 
   @override
@@ -77,48 +73,34 @@ class CollectionScreenState extends State<CollectionScreen> {
         ]
       ),
       body: Center(
-        child: FutureBuilder<List<String>>(
-          future: futureImageUrls,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text('ERROR: ${snapshot.error}');
-            } else if (snapshot.hasData) {
-              final List<String> imageUrls = snapshot.data!;
-              return Padding(
-                padding: const EdgeInsets.all(10),
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 5,
-                    childAspectRatio: 735 / 1025,
-                  ),
-                  itemCount: imageUrls.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        CardInfo currentCard = CardInfo();
-                        currentCard.setID(widget.collect.cardIds[index]);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CardInfoScreen(index, widget.collect),
-                          ),
-                        );
-                      },
-                      child: Image.network(
-                        imageUrls[index],
-                      ),
-                    );
-                  },
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 5,
+              childAspectRatio: 735 / 1025,
+            ),
+            itemCount: imgURLs.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  CardInfo currentCard = CardInfo();
+                  currentCard.setID(widget.collect.cardIds[index]);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CardInfoScreen(index, widget.collect),
+                    ),
+                  );
+                },
+                child: Image.network(
+                  imgURLs[index],
                 ),
               );
-            } else {
-              return const Text('No Data');
-            }
-          },
+            },
+          ),
         ),
       ),
     );
