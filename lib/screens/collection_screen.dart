@@ -3,9 +3,7 @@ import 'package:tcg_app_sp/screens/card_info_screen.dart';
 import 'package:tcg_app_sp/models/card.dart';
 import 'package:tcg_app_sp/models/collection.dart';
 import 'package:tcg_app_sp/screens/search_card_screen.dart';
-import 'package:tcg_app_sp/screens/menu_screen.dart';
 import 'package:tcg_app_sp/SQLite/sqlite.dart';
-//import 'package:tcg_app_sp/screens/deck_builder_screen.dart';
 
 class CollectionScreen extends StatefulWidget {
   final Collection collect;
@@ -43,7 +41,8 @@ class CollectionScreenState extends State<CollectionScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.push(context,MaterialPageRoute(builder: (context) => MenuScreen(widget.collect),));
+            // Navigator.push(context,MaterialPageRoute(builder: (context) => MenuScreen(widget.collect),));
+            Navigator.pop(context);
           },
         ), 
         title: const Text(

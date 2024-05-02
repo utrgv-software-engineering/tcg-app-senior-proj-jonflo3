@@ -54,7 +54,8 @@ class CollectionScreenState extends State<CollectionScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.push(context,MaterialPageRoute(builder: (context) => MenuScreen(widget.collect),));
+            // Navigator.push(context,MaterialPageRoute(builder: (context) => MenuScreen(widget.collect),));
+            Navigator.of(context).pop;
           },
         ), 
         title: const Text(

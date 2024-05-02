@@ -1,50 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-//import 'package:tcg_app_sp/models/card.dart';
+import 'package:tcg_app_sp/models/decks.dart';
+import 'package:tcg_app_sp/screens/card_info_screen.dart';
+import 'package:tcg_app_sp/models/card.dart';
 import 'package:tcg_app_sp/models/collection.dart';
-//import 'package:tcg_app_sp/models/userinfo.dart';
-//import 'package:tcg_app_sp/screens/card_info_screen.dart';
-//import 'package:tcg_app_sp/screens/collection_screen.dart';
+import 'package:tcg_app_sp/SQLite/sqlite.dart';
 
 class ProfileScreen extends StatefulWidget {
   final Collection collect;
+  final Decks deck;  
 
-  const ProfileScreen(this.collect, {super.key});
+  const ProfileScreen(this.collect, this.deck, {super.key});
 
   @override
   ProfileScreenState createState() => ProfileScreenState();
 }
 
-class ProfileScreenState extends State<ProfileScreen>{
-  late Future<List<String>> futureImageUrls;
+class ProfileScreenState extends State<ProfileScreen> {
+  List<String> imgURLs = [];
   late String usrName;
   late double collectionPrice = 0.0;
+  late int cardsQty = widget.collect.allCards.length;
+  late int decksQty = widget.deck.allDecks.length;
 
   @override
   void initState() {
     super.initState();
     usrName = widget.collect.getName();
-    futureImageUrls = Future.value([]);
-    initializeImageUrls();
+    fetchImageUrls(widget.collect.username);
   }
 
-  Future<void> initializeImageUrls() async {
-    List<String> imageUrls = await fetchImageUrls(widget.collect.cardIds);
+  Future<void> fetchImageUrls(String user) async {
+    List<String> urls = await DataBaseHelper().getImageUrlsForUser(user);
     setState(() {
-      futureImageUrls = Future.value(imageUrls);
+      imgURLs = urls;
     });
-  }
-
-  Future<List<String>> fetchImageUrls(List<String> cardIds) async {
-    List<String> imageUrls = [];
-    for (String cardId in cardIds) {
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('PokeCards').doc(cardId).get();
-      if (snapshot.exists) {
-        String imageUrl = snapshot['images']['small'];
-        imageUrls.add(imageUrl);
-      }
-    }
-    return imageUrls;
   }
 
   @override
@@ -55,11 +44,12 @@ class ProfileScreenState extends State<ProfileScreen>{
         elevation: 0, 
         iconTheme: const IconThemeData(color: Colors.white),
         leading: IconButton(
-          onPressed: () async {
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            // Navigator.push(context,MaterialPageRoute(builder: (context) => MenuScreen(widget.collect),));
             Navigator.pop(context);
           },
-          icon: const Icon(Icons.home),
-          ),
+        ), 
         title: Text(
           'Hello, $usrName!',
           style: const TextStyle(
@@ -67,10 +57,13 @@ class ProfileScreenState extends State<ProfileScreen>{
             fontWeight: FontWeight.bold,
           ),
         ),
-        centerTitle: true, 
-        ),
-        body: Center(
+        centerTitle: true,
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(10),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 10),
               const CircleAvatar(
@@ -98,69 +91,49 @@ class ProfileScreenState extends State<ProfileScreen>{
                 },
               ),
               const SizedBox(height: 5),
-              const Text('Total cards: 999',
-              style: TextStyle(
+              Text('Total cards: $cardsQty',
+              style: const TextStyle(
                 fontSize: 18,
               ),
               ),
               const SizedBox(height: 5),
-              const Text('Number of decks: 151',
-              style: TextStyle(
+              Text('Number of decks: $decksQty',
+              style: const TextStyle(
                 fontSize: 18,
               ),
               ),
-              /*Expanded(
-                child: ListView(
-                  children: [
-                    FutureBuilder<List<String>>(
-                      future: futureImageUrls,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text('ERROR: ${snapshot.error}');
-                        } else if (snapshot.hasData) {
-                          final List<String> imageUrls = snapshot.data!;
-                          return Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: GridView.builder(
-                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 4,
-                                crossAxisSpacing: 10,
-                                mainAxisSpacing: 5,
-                                childAspectRatio: 735 / 1025,
-                              ),
-                              itemCount: imageUrls.length,
-                              itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    CardInfo currentCard = CardInfo();
-                                    currentCard.setID(widget.collect.cardIds[index]);
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => CardInfoScreen(index, widget.collect),
-                                      ),
-                                    );
-                                  },
-                                  child: Image.network(
-                                    imageUrls[index],
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        } else {
-                          return const Text('No Data');
-                        }
-                      },
-                    ),
-                  ],
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 5,
+                  childAspectRatio: 735 / 1025,
                 ),
-                ),  */            
+                itemCount: imgURLs.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      CardInfo currentCard = CardInfo();
+                      currentCard.setID(widget.collect.cardIds[index]);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CardInfoScreen(index, widget.collect),
+                        ),
+                      );
+                    },
+                    child: Image.network(
+                      imgURLs[index],
+                    ),
+                  );
+                },
+              ),
+            ),
             ],
-          ),
-        ),
+          )
+        )
+      ),
     );
   }
 }

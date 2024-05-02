@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tcg_app_sp/SQLite/sqlite.dart';
+import 'package:tcg_app_sp/models/decks.dart';
 import 'package:tcg_app_sp/models/userinfo.dart';
 import 'package:tcg_app_sp/screens/menu_screen.dart';
 import 'package:tcg_app_sp/models/collection.dart';
@@ -33,9 +34,10 @@ class _LogInScreen extends State<LogInScreen>{
     if(response == true){
       if(!mounted) return;
       Collection collect = Collection(cardIds: [], username: usernameController.text);
+      Decks deck = Decks();
       await collect.fetchUserData();
       Navigator.push(context, MaterialPageRoute(
-        builder: (context) => MenuScreen(collect),
+        builder: (context) => MenuScreen(collect, deck),
       ),);
     } else {
       if(!mounted) return;
