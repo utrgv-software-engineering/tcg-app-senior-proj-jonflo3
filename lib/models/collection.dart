@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:tcg_app_sp/models/decks.dart';
 import 'package:tcg_app_sp/SQLite/sqlite.dart';
 
 
@@ -11,11 +10,6 @@ class Collection {
   List<Map<String, dynamic>> allCards = [];
   List<String> cardIds;
   String username = '';
-  Decks myDecks;
-  
-
-
-
 
   void assignUserName(String un) {
     username = un;
@@ -137,19 +131,19 @@ class Collection {
   void addCardID(String cardID) async {
     cardIds.add(cardID);
 
-    DocumentReference userDocRef = FirebaseFirestore.instance.collection('usersAndTheirCollection').doc(username);
+    /*DocumentReference userDocRef = FirebaseFirestore.instance.collection('usersAndTheirCollection').doc(username);
     await userDocRef.update({
         'PokeIDs': FieldValue.arrayUnion([cardID]),
-    });
+    });*/
 
     DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('PokeCards').doc(cardID).get();
-
+    final db = DataBaseHelper();
     if (snapshot.exists) {
       String cardName = snapshot['name'];
       cardName = cardName.replaceAll("'", "''");
       String imgURL = snapshot['images']['small'];
       String cardType = snapshot['supertype'];
-      final db = DataBaseHelper();
+      
       db.addCardToCollection(
       cardID, 
       getName(), 
@@ -157,80 +151,23 @@ class Collection {
       imgURL, 
       cardType
       );
-      if(snapshot['supertype'] == 'Pokémon'){
-        String cardName = snapshot['name'];
-        String cardRarity = snapshot['rarity'];
-        String cardType = snapshot['supertype'];
-        List pokeType = snapshot['types'];
-        List stage = snapshot['subtypes'];
-        List moves = snapshot['attacks'];
-        List weakness = snapshot['weaknesses'];
-        List retreatCost = snapshot['retreatCost'];
-        String cardNum = snapshot['number'];
-        String imgURL = snapshot['images']['small'];
-
-        Map<String, dynamic> newEntry = {
-          'id': cardID,
-          'name': cardName,
-          'rarity': cardRarity,
-          'type': cardType,
-          'poke type': pokeType,
-          'stage': stage,
-          'moves': moves,
-          'weakness': weakness,
-          'retreat cost': retreatCost,
-          'number': cardNum,
-          'imgURL': imgURL,
-        };
-
-        allCards.add(newEntry);
-      }else if(snapshot['supertype'] == 'Trainer'){
-        String cardName = snapshot['name'];
-        String cardRarity = snapshot['rarity'];
-        String cardType = snapshot['supertype'];
-        List cardRules = snapshot['rules'];
-        String cardNum = snapshot['number'];
-        String imgURL = snapshot['images']['small'];
-
-        Map<String, dynamic> newEntry = {
-          'id': cardID,
-          'name': cardName,
-          'rarity': cardRarity,
-          'type': cardType,
-          'rules': cardRules,
-          'number': cardNum,
-          'imgURL': imgURL,
-        };
-
-        allCards.add(newEntry);
-      }else{
-        String cardName = snapshot['name'];
-        String cardType = snapshot['supertype'];
-        String cardNum = snapshot['number'];
-        String imgURL = snapshot['images']['small'];
-
-        Map<String, dynamic> newEntry = {
-          'id': cardID,
-          'name': cardName,
-          'type': cardType,
-          'number': cardNum,
-          'imgURL': imgURL,
-        };
-
-        allCards.add(newEntry);
-      }
     }
+    updateCardIDs();
+    cardIds = await db.getCardIdsForUser(getName());
 
 
   }
 
+  void printList () {
+    print(cardIds);
+  }
 
 
-  void removeCardID(int index) async {
-    String id = cardIds[index];
-    allCards.removeWhere((element) => element['id'] == id);
 
-    DocumentReference userDocRef = FirebaseFirestore.instance.collection('usersAndTheirCollection').doc(username);
+  void removeCardID(String id) async {
+    //allCards.removeWhere((element) => element['id'] == id);
+
+    /*DocumentReference userDocRef = FirebaseFirestore.instance.collection('usersAndTheirCollection').doc(username);
 
     DocumentSnapshot snapshot = await userDocRef.get();
     if (snapshot.exists) {
@@ -238,20 +175,18 @@ class Collection {
       idLIST.removeAt(index);
       await userDocRef.update({'PokeIDs': idLIST});
 
-    } 
+    } */
 
     final db = DataBaseHelper();
       db.deleteCardFromCollection(
       id, 
       getName(), 
     );
-    
-    cardIds.removeAt(index);
+    updateCardIDs();
   }
 
   //Constructors 
-  Collection({required this.cardIds, required this.username,}) 
-    : myDecks = Decks() {
+  Collection({required this.cardIds, required this.username,}) {
     assignUserName(username);
 
   }

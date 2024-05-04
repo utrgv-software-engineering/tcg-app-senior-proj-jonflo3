@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tcg_app_sp/models/collection.dart';
+import 'package:tcg_app_sp/SQLite/sqlite.dart';
 
 class DeckBuilderScreen extends StatefulWidget {
   final Collection collect;
@@ -13,6 +14,9 @@ class DeckBuilderScreen extends StatefulWidget {
 class DeckBuilderScreenState extends State<DeckBuilderScreen> {
   List<Map<String, dynamic>> collection = [];
   num cardSum60 = 0; 
+  String deckName = 'New Deck';
+  TextEditingController deckNameController = TextEditingController();
+  bool isEditing = false;
 
   @override
   void initState() {
@@ -53,9 +57,9 @@ class DeckBuilderScreenState extends State<DeckBuilderScreen> {
         backgroundColor: const Color(0xFF404040),
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text(
-          'Create Your Deck',
-          style: TextStyle(
+        title: Text(
+          deckName,
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
@@ -65,6 +69,53 @@ class DeckBuilderScreenState extends State<DeckBuilderScreen> {
       body: Center(
         child: Column(
           children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        isEditing = true;
+                        deckNameController.text = deckName;
+                      });
+                    },
+                    child: const Text(
+                      'Edit Deck Name',
+                      style: TextStyle(
+                        fontSize: 12,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isEditing)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: deckNameController,
+                        decoration: const InputDecoration(
+                          hintText: 'Enter Deck Name',
+                        ),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          deckName = deckNameController.text;
+                          isEditing = false;
+                        });
+                      },
+                      child: const Text('Save'),
+                    ),
+                  ],
+                ),
+              ),
             _buildCardDropdown('Collection', collection, cardSum60),
             _buildSelectedCardsList(),
           ],
@@ -224,31 +275,29 @@ class DeckBuilderScreenState extends State<DeckBuilderScreen> {
           Column(
             children: [
               const Text('Pokémon'),
-              ...pokemonCards.map((card) => _buildCardTile(card, cardSum60)).toList(),
+              ...pokemonCards.map((card) => _buildCardTile(card, cardSum60)),
             ],
           ),
         if (trainerCards.isNotEmpty)
           Column(
             children: [
               const Text('Trainer'),
-              ...trainerCards.map((card) => _buildCardTile(card, cardSum60)).toList(),
+              ...trainerCards.map((card) => _buildCardTile(card, cardSum60)),
             ],
           ),
         if (energyCards.isNotEmpty)
           Column(
             children: [
               const Text('Energy'),
-              ...energyCards.map((card) => _buildCardTile(card, cardSum60)).toList(),
+              ...energyCards.map((card) => _buildCardTile(card, cardSum60)),
             ],
           ),
         Text('$cardSum60/60 Cards'),
         if (cardSum60 == 60)
           ElevatedButton(
             onPressed: () {
-              print(selectedCards);
-              widget.collect.myDecks.addDeck(selectedCards);
-              print(widget.collect.myDecks.allDecks);
-              //selectedCards.clear();
+              final db = DataBaseHelper();
+              db.saveDeck(widget.collect.username, deckName, pokemonCards, trainerCards, energyCards);
               Navigator.of(context).pop();
             },
             child: const Text('Save Deck'),

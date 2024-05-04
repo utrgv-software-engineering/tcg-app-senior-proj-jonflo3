@@ -3,6 +3,7 @@ import 'package:tcg_app_sp/models/collection.dart';
 import 'package:tcg_app_sp/screens/deck_builder_screen.dart';
 import 'package:tcg_app_sp/screens/menu_screen.dart';
 import 'package:tcg_app_sp/screens/view_deck_screen.dart';
+import 'package:tcg_app_sp/SQLite/sqlite.dart';
 
 class DeckMenuScreen extends StatefulWidget{
   final Collection collect;
@@ -13,13 +14,19 @@ class DeckMenuScreen extends StatefulWidget{
 }
 
 class DeckMenuScreenState extends State<DeckMenuScreen> {
-  List<List<Map<String, dynamic>>> deckNames = [];
+  List<String> deckNames = [];
   bool isListEmpty = true;
 
   @override
   void initState() {
     super.initState();
-    deckNames = widget.collect.myDecks.allDecks;
+    fetchDeckNames();
+  }
+
+  Future<void> fetchDeckNames() async {
+    final db = DataBaseHelper();
+    deckNames = await db.getUniqueDeckNames();
+
     if (deckNames.isEmpty) {
       setState(() {
         isListEmpty = true;
@@ -95,10 +102,10 @@ class DeckMenuScreenState extends State<DeckMenuScreen> {
                   if (index < deckNames.length) {
                     return Center(
                       child: ListTile(
-                        title: Text('Deck ${index + 1}'),
+                        title: Text(deckNames[index]),
                         onTap: () {
                           Navigator.push(context,MaterialPageRoute(
-                            builder: (context) => ViewDeckScreen(index, widget.collect),
+                            builder: (context) => ViewDeckScreen(deckNames[index], widget.collect),
                           ));
                         },
                       ),
