@@ -4,10 +4,10 @@ import 'collection_screen.dart';
 
 
 class CardInfoScreen extends StatefulWidget {
-  final int index;
+  final Map<String, dynamic> cardInfo;
   final Collection collect;
 
-  const CardInfoScreen(this.index, this.collect, {super.key});
+  const CardInfoScreen(this.cardInfo, this.collect, {super.key});
 
   @override
   _CardInfoScreenState createState() => _CardInfoScreenState();
@@ -22,7 +22,7 @@ class _CardInfoScreenState extends State<CardInfoScreen> {
   void initState() {
     super.initState();
     //currentCard.setID(widget.collect.cardIds[widget.index]);
-    cardInformation = fetchCardInfo(widget.collect.cardIds[widget.index]);
+    cardInformation = widget.cardInfo;
 
   }
 
@@ -96,7 +96,7 @@ void showRemoveCardDialogue(BuildContext context, String cardName) {
           TextButton(
             onPressed: () async {
               setState(() {
-                widget.collect.removeCardID(widget.index);
+                widget.collect.removeCardID(widget.cardInfo['id']);
               });
               Navigator.pop(context); // Close the dialog
               Navigator.push(context, MaterialPageRoute(
