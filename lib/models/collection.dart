@@ -153,13 +153,13 @@ class Collection {
       );
     }
     updateCardIDs();
-    cardIds = await db.getCardIdsForUser(getName());
+    //cardIds = await db.getCardIdsForUser(getName());
 
 
   }
 
   void printList () {
-    print(cardIds);
+    //print(cardIds);
   }
 
 

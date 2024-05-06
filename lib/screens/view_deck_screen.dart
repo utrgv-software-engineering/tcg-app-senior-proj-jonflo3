@@ -90,13 +90,21 @@ class _ViewDeckScreenState extends State<ViewDeckScreen> {
         ),
       ],
       ),
-      body: Center(
-        child: Column(
-          children: [
-            _buildCardList('Pokémon', 'Pokémon'),
-            _buildCardList('Trainer', 'Trainer'),
-            _buildCardList('Energy', 'Energy'),
-          ],
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            children: [
+              _buildCardList('Pokémon', 'Pokémon'),
+              _buildCardList('Trainer', 'Trainer'),
+              _buildCardList('Energy', 'Energy'),
+              ElevatedButton(
+                onPressed: () {
+                  drawRandomCard();
+                },
+                child: const Text('Draw a Card'),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -111,7 +119,7 @@ class _ViewDeckScreenState extends State<ViewDeckScreen> {
           Column(
             children: [
               Text(header),
-              ...cardsOfType.map((card) => _buildCardTile(card)).toList(),
+              ...cardsOfType.map((card) => _buildCardTile(card)),
             ],
           ),
       ],
@@ -123,6 +131,37 @@ class _ViewDeckScreenState extends State<ViewDeckScreen> {
       leading: Image.network(card['imgURL']),
       title: Text(card['cardName']),
       subtitle: Text('Quantity: ${card['quantity']}'),
+    );
+  }
+
+  void drawRandomCard() async {
+    final db = DataBaseHelper();
+    Map<String, dynamic> randomCard = await db.drawRandomCardFromDeck(widget.collect.username, widget.deckName);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Randomly Drawn Card'),
+          content: Column(
+            children: [
+              Image.network(randomCard['imgURL']),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 1), // Add vertical padding around the text
+                child: Text(randomCard['cardName']),
+              ),
+              const SizedBox(height:1),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); 
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
