@@ -8,7 +8,6 @@ import 'package:tcg_app_sp/screens/profile_screen.dart';
 
 class MenuScreen extends StatefulWidget {
   final Collection collect;
-
   const MenuScreen(this.collect, {super.key});
 
   @override

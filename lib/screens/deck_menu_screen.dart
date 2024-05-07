@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tcg_app_sp/models/collection.dart';
 import 'package:tcg_app_sp/screens/deck_builder_screen.dart';
-import 'package:tcg_app_sp/screens/menu_screen.dart';
 import 'package:tcg_app_sp/screens/view_deck_screen.dart';
 import 'package:tcg_app_sp/SQLite/sqlite.dart';
 
@@ -48,7 +47,8 @@ class DeckMenuScreenState extends State<DeckMenuScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.push(context,MaterialPageRoute(builder: (context) => MenuScreen(widget.collect),));
+            // Navigator.push(context,MaterialPageRoute(builder: (context) => MenuScreen(widget.collect),));
+            Navigator.pop(context);
           },
         ), 
         title: const Text(
@@ -80,8 +80,8 @@ class DeckMenuScreenState extends State<DeckMenuScreen> {
                   ));
                 },
                 style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all<Color>(const Color(0xFF404040)), 
-                  padding: WidgetStateProperty.all<EdgeInsetsGeometry>(const EdgeInsets.all(10)), 
+                  backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF404040)), 
+                  padding: MaterialStateProperty.all<EdgeInsetsGeometry>(const EdgeInsets.all(10)), 
                 ),
                 child: const Text('Add a Deck',
                   style: TextStyle(
@@ -120,8 +120,8 @@ class DeckMenuScreenState extends State<DeckMenuScreen> {
                           ));
                         },
                         style: ButtonStyle(
-                          backgroundColor: WidgetStateProperty.all<Color>(const Color(0xFF404040)),
-                          padding: WidgetStateProperty.all<EdgeInsetsGeometry>(const EdgeInsets.all(10)),
+                          backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF404040)),
+                          padding: MaterialStateProperty.all<EdgeInsetsGeometry>(const EdgeInsets.all(10)),
                         ),
                         child: const Text('Add Deck',
                           style: TextStyle(

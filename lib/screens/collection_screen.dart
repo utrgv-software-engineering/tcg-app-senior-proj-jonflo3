@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:tcg_app_sp/screens/card_info_screen.dart';
 import 'package:tcg_app_sp/models/collection.dart';
 import 'package:tcg_app_sp/screens/search_card_screen.dart';
-import 'package:tcg_app_sp/screens/menu_screen.dart';
 import 'package:tcg_app_sp/SQLite/sqlite.dart';
-//import 'package:tcg_app_sp/screens/deck_builder_screen.dart';
+import 'package:tcg_app_sp/screens/menu_screen.dart';
 
 class CollectionScreen extends StatefulWidget {
   final Collection collect;
@@ -44,9 +43,10 @@ class CollectionScreenState extends State<CollectionScreen> {
         elevation: 0, 
         iconTheme: const IconThemeData(color: Colors.white),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.home, color: Colors.white),
           onPressed: () {
             Navigator.push(context,MaterialPageRoute(builder: (context) => MenuScreen(widget.collect),));
+            // Navigator.pop(context);
           },
         ), 
         title: const Text(
