@@ -66,59 +66,61 @@ class DeckBuilderScreenState extends State<DeckBuilderScreen> {
         ),
         centerTitle: true,
       ),
-      body: Center(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        isEditing = true;
-                        deckNameController.text = deckName;
-                      });
-                    },
-                    child: const Text(
-                      'Edit Deck Name',
-                      style: TextStyle(
-                        fontSize: 12,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (isEditing)
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   children: [
-                    Expanded(
-                      child: TextField(
-                        controller: deckNameController,
-                        decoration: const InputDecoration(
-                          hintText: 'Enter Deck Name',
-                        ),
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
+                    GestureDetector(
+                      onTap: () {
                         setState(() {
-                          deckName = deckNameController.text;
-                          isEditing = false;
+                          isEditing = true;
+                          deckNameController.text = deckName;
                         });
                       },
-                      child: const Text('Save'),
+                      child: const Text(
+                        'Edit Deck Name',
+                        style: TextStyle(
+                          fontSize: 12,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
-            _buildCardDropdown('Collection', collection, cardSum60),
-            _buildSelectedCardsList(),
-          ],
+              if (isEditing)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: deckNameController,
+                          decoration: const InputDecoration(
+                            hintText: 'Enter Deck Name',
+                          ),
+                      ) ,
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            deckName = deckNameController.text;
+                            isEditing = false;
+                          });
+                        },
+                        child: const Text('Save'),
+                      ),
+                    ],
+                  ),
+                ),
+              _buildCardDropdown('Collection', collection, cardSum60),
+              _buildSelectedCardsList(),
+            ],
+          ),
         ),
       ),
     );

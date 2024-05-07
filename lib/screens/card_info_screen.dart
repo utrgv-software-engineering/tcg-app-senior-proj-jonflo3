@@ -242,7 +242,7 @@ void showRemoveCardDialogue(BuildContext context, String cardName) {
               Row(
                 children: [
                   Text('no information',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Color.fromARGB(255, 7, 6, 6),
                       fontWeight: FontWeight.bold,
                       fontSize: 35,

@@ -1,7 +1,8 @@
-  import 'package:sqflite/sqflite.dart';
-  import 'package:tcg_app_sp/models/userinfo.dart';
-  //import 'package:path_provider/path_provider.dart';
-  import 'package:path/path.dart';
+import 'dart:math';
+import 'package:sqflite/sqflite.dart';
+import 'package:tcg_app_sp/models/userinfo.dart';
+//import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart';
 
 class DataBaseHelper{
   final databaseName = "users.db";
@@ -96,7 +97,7 @@ class DataBaseHelper{
       );
 
     List<String> imageUrls = result.map((row) => row['imgURL'] as String).toList();
-    print(imageUrls);
+    //print(imageUrls);
 
       return imageUrls;
     }
@@ -112,7 +113,7 @@ class DataBaseHelper{
       );
 
     List<String> cardIds = result.map((row) => row['cardID'] as String).toList();
-    print(cardIds);
+    //print(cardIds);
 
     return cardIds;
   }
@@ -196,5 +197,24 @@ class DataBaseHelper{
       where: 'user = ? AND deckName = ?',
       whereArgs: [user, deckName],
     );
+  }
+
+  Future<Map<String, dynamic>> drawRandomCardFromDeck(String user, String deckName) async {
+
+    List<Map<String, dynamic>> deckCards = await searchDeck(user, deckName);
+
+    int totalCards = 60;
+  // Generate a random number between 1 and the total number of cards
+    int randomNumber = Random().nextInt(totalCards) + 1;
+
+  // Iterate through the deck to find the card based on the random number
+    num cumulativeQuantity = 0;
+    for (var card in deckCards) {
+      cumulativeQuantity += card['quantity'];
+      if (randomNumber <= cumulativeQuantity) {
+        return card;
+      }
+    }
+    return deckCards[1];
   }
 }
