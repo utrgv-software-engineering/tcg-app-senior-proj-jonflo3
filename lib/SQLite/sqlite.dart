@@ -15,7 +15,7 @@ class DataBaseHelper{
 
     //print("Database path: $path");
 
-    return openDatabase(path, version: 2, onCreate: (db, version) async {
+    return openDatabase(databaseName, version: 2, onCreate: (db, version) async {
     await db.execute(userTable);
     await db.execute(collectionTable);
     await db.execute(deckTable);
@@ -164,6 +164,16 @@ class DataBaseHelper{
     List<String> uniqueDeckNames = result.map((row) => row['deckName'] as String).toList();
 
     return uniqueDeckNames;
+  }
+
+  Future<int> getDecksQty() async {
+    final Database db = await initDB();
+
+    List<Map<String, dynamic>> result = await db.rawQuery('SELECT COUNT(*) as count FROM deck');
+
+    int decksQty = result.length;
+
+    return decksQty;
   }
 
   Future<List<Map<String, dynamic>>> searchDeck(String user, String deckName) async {

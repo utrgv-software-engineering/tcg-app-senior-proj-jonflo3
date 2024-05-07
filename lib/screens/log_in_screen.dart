@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:tcg_app_sp/SQLite/sqlite.dart';
-import 'package:tcg_app_sp/models/decks.dart';
 import 'package:tcg_app_sp/models/userinfo.dart';
 import 'package:tcg_app_sp/screens/menu_screen.dart';
 import 'package:tcg_app_sp/models/collection.dart';
 import 'package:tcg_app_sp/screens/reset_password_screen.dart';
-// import 'package:tcg_app_sp/screens/sign_up_screen.dart';
 import 'package:tcg_app_sp/screens/sign_up_screen.dart';
-//import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({super.key});
@@ -34,10 +31,10 @@ class _LogInScreen extends State<LogInScreen>{
     if(response == true){
       if(!mounted) return;
       Collection collect = Collection(cardIds: [], username: usernameController.text);
-      Decks deck = Decks();
+      // Decks deck = Decks();
       await collect.fetchUserData();
       Navigator.push(context, MaterialPageRoute(
-        builder: (context) => MenuScreen(collect, deck),
+        builder: (context) => MenuScreen(collect),
       ),);
     } else {
       if(!mounted) return;
